@@ -21,9 +21,14 @@ namespace FormulaEvaluator
     ///    
     /// </summary>
 
-
-    public class Evaluator
+    public static class Evaluator
     {
-       
+        public delegate int Lookup(String variable_name);
+
+        public static int Evaluate(String expression, Lookup variableEvaluator)
+        {
+            int result = 0;
+            return result;
+        }
     }
 }
