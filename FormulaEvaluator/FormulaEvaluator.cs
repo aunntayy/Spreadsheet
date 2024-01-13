@@ -30,7 +30,7 @@ namespace FormulaEvaluator
 
         public static int Evaluate(String expression, Lookup variableEvaluator)
         {
-            Stack numstack = new();
+            Stack valstack = new();
             Stack opstack = new();
 
 
@@ -38,23 +38,18 @@ namespace FormulaEvaluator
 
             // Check each substring 
             foreach (string substring in substrings) {
-                //if t = "+"
-                if (substring == "+")
+                //if t = "+" or "-"
+                if (substring == "+" || substring == "-")
                 {
-                    double num1 = (double)numstack.Pop();
-                    double num2 = (double)numstack.Pop();
-                    opstack.Pop();
-                    numstack.Push(num1 - num2);
-                    opstack.Push(substring);
-                }
-                //if t = "-"
-                else if (substring == "-")
-                {
-                    double num1 = (double)numstack.Pop();
-                    double num2 = (double)numstack.Pop();
-                    opstack.Pop();
-                    numstack.Push(num1 - num2);
-                    opstack.Push(substring);
+                    if (valstack.Count >= 2)
+                    {
+                        double num1 = (double)valstack.Pop();
+                        double num2 = (double)valstack.Pop();
+                        string op = (string)opstack.Pop();
+                        valstack.Push(math(num1, op, num2));
+                        opstack.Push(substring);
+                    }
+                    else { throw new Exception("less an 2 var in valstack"); }
                 }
                 //if t = "*", "/", "("
                 else if (substring == "*" || substring == "/" || substring == "(")
@@ -63,55 +58,61 @@ namespace FormulaEvaluator
                 }
                 //if t is an integer
                 else if (int.TryParse(substring, out int n)) {
-                    if (opstack.Peek() == "*" || opstack.Peek() == "/")
+                    if (valstack.Count == 0)
                     {
-                        //For mutiply
-                        if (opstack.Peek() == "*")
+                        //For mutiply and divine
+                        if (opstack.Peek() == "*" || opstack.Peek() == "/")
                         {
-                            double num1 = (double)numstack.Pop();
-                            numstack.Push(num1 * n);
+                            double num1 = (double)valstack.Pop();
+                            string op = (string)opstack.Pop();
+                            valstack.Push(math(num1, op, n));
                         }
-                        //For divinding
-                        else {
-                            double num1 = (double)numstack.Pop();
-                            numstack.Push(num1 / n);
-                        }
+                        //push t onto value stack
+                        else { valstack.Push(n); }
                     }
+                    else { throw new Exception("Empty value stack"); }
                 }
                 // if t = ")"
                 else if (substring == ")") {
-                    //if top is +
-                    if (opstack.Peek() == "+") {
-                    double num1 = (double)numstack.Pop();
-                    double num2 = (double)numstack.Pop();
-                    opstack.Pop();
-                    numstack.Push(num1 + num2);
-                    }
-                    //if top is - 
-                    else {
-                        double num1 = (double)numstack.Pop();
-                        double num2 = (double)numstack.Pop();
-                        opstack.Pop();
-                        numstack.Push(num1 - num2);
-                    }
-                    //the top should be "(", pop it
-                    opstack.Pop();
-                    // If * or / is at the top
-                    if (opstack.Peek() == "*")
+                    if (valstack.Count >= 2)
                     {
-                        double num1 = (double)numstack.Pop();
-                        double num2 = (double)numstack.Pop();
-                        opstack.Pop();
-                        numstack.Push(num1 * num2);
+                        //if top is +
+                        if (opstack.Peek() == "+" || opstack.Peek() == "-")
+                        {
+                            double num1 = (double)valstack.Pop();
+                            double num2 = (double)valstack.Pop();
+                            string op = (string)opstack.Pop();
+                            valstack.Push(math(num1, op, num2));
+                            if (opstack.Peek() == "(") { opstack.Pop(); } //the top should be "(", pop it
+                            else { throw new Exception("The top is not ( "); };
+                        }
                     }
-                    else {
-                        double num1 = (double)numstack.Pop();
-                        double num2 = (double)numstack.Pop();
-                        opstack.Pop();
-                        numstack.Push(num1 / num2);
+                    else { throw new Exception("less an 2 var in valstack"); }
+                    if (valstack.Count >= 2)
+                    {
+                        // If * or / is at the top
+                        if (opstack.Peek() == "*" || opstack.Peek() == "-")
+                    {
+                        double num1 = (double)valstack.Pop();
+                        double num2 = (double)valstack.Pop();
+                        string op = (string)opstack.Pop();
+                        valstack.Push(math(num1, op, num2));
                     }
+                    }
+                    else { throw new Exception("less an 2 var in valstack"); }
                 }
+                //if t is a variable
             }
           }
+        
+        private static double math(double num1, string op, double num2)
+        {
+            double value = 0;
+            if (op == "+") { value = num1 + num2;}
+            else if (op == "-") {  value = num1 - num2;}
+            else if (op == "*") {  value = num1 * num2;}
+            else if (op == "/") { if (num2 == 0) { throw new DivideByZeroException("Cannot divine by zero"); } else { value = num1 / num2; } } 
+            return value;
+        }
     }
     }
