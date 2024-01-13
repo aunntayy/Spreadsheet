@@ -94,6 +94,22 @@ namespace FormulaEvaluator
                         opstack.Pop();
                         numstack.Push(num1 - num2);
                     }
+                    //the top should be "(", pop it
+                    opstack.Pop();
+                    // If * or / is at the top
+                    if (opstack.Peek() == "*")
+                    {
+                        double num1 = (double)numstack.Pop();
+                        double num2 = (double)numstack.Pop();
+                        opstack.Pop();
+                        numstack.Push(num1 * num2);
+                    }
+                    else {
+                        double num1 = (double)numstack.Pop();
+                        double num2 = (double)numstack.Pop();
+                        opstack.Pop();
+                        numstack.Push(num1 / num2);
+                    }
                 }
             }
           }
