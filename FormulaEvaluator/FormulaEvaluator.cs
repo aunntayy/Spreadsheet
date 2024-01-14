@@ -28,7 +28,7 @@ namespace FormulaEvaluator
     {
         public delegate int Lookup(String variable_name);
 
-        public static int Evaluate(String expression, Lookup variableEvaluator)
+        public static double Evaluate(String expression, Lookup variableEvaluator)
         {
             Stack valstack = new();
             Stack opstack = new();
@@ -92,16 +92,39 @@ namespace FormulaEvaluator
                     {
                         // If * or / is at the top
                         if (opstack.Peek() == "*" || opstack.Peek() == "-")
-                    {
-                        double num1 = (double)valstack.Pop();
-                        double num2 = (double)valstack.Pop();
-                        string op = (string)opstack.Pop();
-                        valstack.Push(math(num1, op, num2));
-                    }
+                        {
+                            double num1 = (double)valstack.Pop();
+                            double num2 = (double)valstack.Pop();
+                            string op = (string)opstack.Pop();
+                            valstack.Push(math(num1, op, num2));
+                        }
                     }
                     else { throw new Exception("less an 2 var in valstack"); }
                 }
                 //if t is a variable
+                else if (Regex.IsMatch(substring, @"[a-zA-Z]+\d+"))
+                {
+                    if (valstack.Count == 0)
+                    {
+                        // Handle variables using the variableEvaluator delegate
+                        double variableValue = variableEvaluator(substring);
+                        //For mutiply and divine
+                        if (opstack.Peek() == "*" || opstack.Peek() == "/")
+                        {
+                            double num1 = (double)valstack.Pop();
+                            string op = (string)opstack.Pop();
+                            valstack.Push(math(num1, op, n));
+                        }
+                        //push t onto value stack
+                        else { valstack.Push(n); }
+                    }
+                    else { throw new Exception("Empty value stack"); }
+                }
+                }
+            //return the value
+            if (valstack.Count == 1 && opstack.Count == 0)
+            {
+                return (double)valstack.Pop();
             }
           }
         
