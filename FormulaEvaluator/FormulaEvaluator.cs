@@ -27,8 +27,14 @@ namespace FormulaEvaluator
     public static class Evaluator
     {
         public delegate int Lookup(String variable_name);
-
-        public static double Evaluate(String expression, Lookup variableEvaluator)
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="expression"></param>
+        /// <param name="variableEvaluator"></param>
+        /// <returns></returns>
+        /// <exception cref="Exception"></exception>
+        public static int Evaluate(String expression, Lookup variableEvaluator)
         {
             Stack valstack = new();
             Stack opstack = new();
@@ -41,10 +47,10 @@ namespace FormulaEvaluator
                 //if t = "+" or "-"
                 if (substring == "+" || substring == "-")
                 {
-                    if (valstack.Count >= 2)
+                    if (valstack.Count >= 2 && opstack.Count >= 1)
                     {
-                        double num1 = (double)valstack.Pop();
-                        double num2 = (double)valstack.Pop();
+                        int num1 = (int)valstack.Pop();
+                        int num2 = (int)valstack.Pop();
                         string op = (string)opstack.Pop();
                         valstack.Push(math(num1, op, num2));
                         opstack.Push(substring);
@@ -63,9 +69,10 @@ namespace FormulaEvaluator
                         //For mutiply and divine
                         if (opstack.Peek() == "*" || opstack.Peek() == "/")
                         {
-                            double num1 = (double)valstack.Pop();
+                            int num1 = (int)valstack.Pop();
+                            int num2 = n;
                             string op = (string)opstack.Pop();
-                            valstack.Push(math(num1, op, n));
+                            valstack.Push(math(num1, op, num2));
                         }
                         //push t onto value stack
                         else { valstack.Push(n); }
@@ -79,8 +86,8 @@ namespace FormulaEvaluator
                         //if top is +
                         if (opstack.Peek() == "+" || opstack.Peek() == "-")
                         {
-                            double num1 = (double)valstack.Pop();
-                            double num2 = (double)valstack.Pop();
+                            int num1 = (int)valstack.Pop();
+                            int num2 = (int)valstack.Pop();
                             string op = (string)opstack.Pop();
                             valstack.Push(math(num1, op, num2));
                             if (opstack.Peek() == "(") { opstack.Pop(); } //the top should be "(", pop it
@@ -93,8 +100,8 @@ namespace FormulaEvaluator
                         // If * or / is at the top
                         if (opstack.Peek() == "*" || opstack.Peek() == "-")
                         {
-                            double num1 = (double)valstack.Pop();
-                            double num2 = (double)valstack.Pop();
+                            int num1 = (int)valstack.Pop();
+                            int num2 = (int)valstack.Pop();
                             string op = (string)opstack.Pop();
                             valstack.Push(math(num1, op, num2));
                         }
@@ -107,16 +114,17 @@ namespace FormulaEvaluator
                     if (valstack.Count == 0)
                     {
                         // Handle variables using the variableEvaluator delegate
-                        double variableValue = variableEvaluator(substring);
+                        int variableValue = variableEvaluator(substring);
                         //For mutiply and divine
                         if (opstack.Peek() == "*" || opstack.Peek() == "/")
                         {
-                            double num1 = (double)valstack.Pop();
+                            int num1 = (int)valstack.Pop();
                             string op = (string)opstack.Pop();
-                            valstack.Push(math(num1, op, n));
+                            int num2 = variableValue;
+                            valstack.Push(math(num1, op, num2));
                         }
                         //push t onto value stack
-                        else { valstack.Push(n); }
+                        else { valstack.Push(variableValue); }
                     }
                     else { throw new Exception("Empty value stack"); }
                 }
@@ -124,11 +132,12 @@ namespace FormulaEvaluator
             //return the value
             if (valstack.Count == 1 && opstack.Count == 0)
             {
-                return (double)valstack.Pop();
+                int finalVal = (int)valstack.Pop();
+                return finalVal;
             }
           }
         
-        private static double math(double num1, string op, double num2)
+        private static double math(int num1, string op, int num2)
         {
             double value = 0;
             if (op == "+") { value = num1 + num2;}
