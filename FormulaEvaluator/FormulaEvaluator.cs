@@ -20,7 +20,7 @@ namespace FormulaEvaluator
     ///
     /// File Contents
     ///
-    ///    [This library evaluates arithmetic expressions using standard infix notation]
+    ///    [This library evaluates arithmetic expressions using standard infix notation.]
     ///    
     /// </summary>
 
