@@ -124,7 +124,7 @@ namespace FormulaEvaluator
             //return the value
             if (valstack.Count == 1 && opstack.Count == 0)
             {
-                return (double)valstack.Pop()haha;
+                return (double)valstack.Pop();
             }
           }
         
