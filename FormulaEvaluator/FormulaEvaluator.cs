@@ -135,6 +135,7 @@ namespace FormulaEvaluator
                 int finalVal = (int)valstack.Pop();
                 return finalVal;
             }
+            else { return 0; }
           }
         
         private static double math(int num1, string op, int num2)
