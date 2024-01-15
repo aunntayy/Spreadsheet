@@ -36,38 +36,39 @@ namespace FormulaEvaluator
         /// <exception cref="Exception"></exception>
         public static int Evaluate(String expression, Lookup variableEvaluator)
         {
-            Stack valstack = new();
+            Stack<int> valstack = new();
             Stack opstack = new();
 
 
             string[] substrings = Regex.Split(expression, "(\\()|(\\))|(-)|(\\+)|(\\*)|(/)");
 
+
             // Check each substring 
             foreach (string substring in substrings) {
+                //Console.WriteLine($"Processing: {substring}");
                 //if t = "+" or "-"
                 if (substring == "+" || substring == "-")
                 {
-                    if (valstack.Count >= 2 && opstack.Count >= 1)
+                    if (valstack.Count >= 2 && opstack.Count > 0 && (opstack.Peek() == "+" || opstack.Peek() == "-"))
                     {
                         int num1 = (int)valstack.Pop();
                         int num2 = (int)valstack.Pop();
                         string op = (string)opstack.Pop();
-                        valstack.Push(math(num1, op, num2));
-                        opstack.Push(substring);
+                        valstack.Push(math(num2, op, num1));
+                        
                     }
-                    else { throw new Exception("less an 2 var in valstack"); }
+                    opstack.Push(substring);
+                    
                 }
+                
                 //if t = "*", "/", "("
-                else if (substring == "*" || substring == "/" || substring == "(")
-                {
+                else if (substring == "*" || substring == "/" || substring == "("){
                     opstack.Push(substring);
                 }
                 //if t is an integer
                 else if (int.TryParse(substring, out int n)) {
-                    if (valstack.Count == 0)
-                    {
                         //For mutiply and divine
-                        if (opstack.Peek() == "*" || opstack.Peek() == "/")
+                        if (valstack.Count > 0 && opstack.Count > 0 && (opstack.Peek() == "*" || opstack.Peek() == "/"))
                         {
                             int num1 = (int)valstack.Pop();
                             int num2 = n;
@@ -76,14 +77,12 @@ namespace FormulaEvaluator
                         }
                         //push t onto value stack
                         else { valstack.Push(n); }
-                    }
-                    else { throw new Exception("Empty value stack"); }
                 }
                 // if t = ")"
                 else if (substring == ")") {
                     if (valstack.Count >= 2)
                     {
-                        //if top is +
+                        //if top is + or "-"
                         if (opstack.Peek() == "+" || opstack.Peek() == "-")
                         {
                             int num1 = (int)valstack.Pop();
@@ -129,18 +128,34 @@ namespace FormulaEvaluator
                     else { throw new Exception("Empty value stack"); }
                 }
                 }
+            //Console.WriteLine($"valstack: [{string.Join(", ", valstack)}]");
+            //Console.WriteLine($"opstack: [{string.Join(", ", opstack)}]");
+            //Console.WriteLine($"Final state: valstack: [{string.Join(", ", valstack)}], opstack: [{string.Join(", ", opstack)}]");
+
+            // Process any remaining operators
+            while (opstack.Count > 0)
+            {
+                int num1 = (int)valstack.Pop();
+                int num2 = (int)valstack.Pop();
+                string op = (string)opstack.Pop();
+                valstack.Push(math(num2, op, num1));
+            }
+
             //return the value
             if (valstack.Count == 1 && opstack.Count == 0)
             {
                 int finalVal = (int)valstack.Pop();
                 return finalVal;
             }
-            else { return 0; }
-          }
+            else
+            {
+                throw new Exception("Invalid expression or incomplete evaluation");
+            }
+        }
         
-        private static double math(int num1, string op, int num2)
+        private static int math(int num1, string op, int num2)
         {
-            double value = 0;
+            int value = 0;
             if (op == "+") { value = num1 + num2;}
             else if (op == "-") {  value = num1 - num2;}
             else if (op == "*") {  value = num1 * num2;}

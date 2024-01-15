@@ -1,49 +1,16 @@
 ﻿// See https://aka.ms/new-console-template for more information
-using FormulaEvaluator;
-using System;
 
-namespace FormulaEvaluatorTester
+try
 {
-    class Program
-    {
-        static void Main()
-        {
-            // Define a variable evaluator delegate
-            Evaluator.Lookup variableEvaluator = VariableLookup;
+    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("4+2", null)) == 6);
+    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("4-2", null)) == 2);
+    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("2-4", null)) == -2);
+    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("4/0", null)) == 0);
+    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("4/2", null)) == 2);
+    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(4-2)*2", null)) == 4);
 
-            // Test expressions
-            TestExpression("(2 + 3) * 5 + 2", variableEvaluator);
-            TestExpression("(2 + X1) * 5 + 2", variableEvaluator);
-            TestExpression("(10 / 2) + (3 * 4)", variableEvaluator);
-            TestExpression("5 * (2 + 3)", variableEvaluator);
-
-            Console.ReadLine();
-        }
-
-        static void TestExpression(string expression, Evaluator.Lookup variableEvaluator)
-        {
-            try
-            {
-                double result = Evaluator.Evaluate(expression, variableEvaluator);
-                Console.WriteLine($"Expression: {expression} = {result}");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Error evaluating expression '{expression}': {ex.Message}");
-            }
-        }
-
-        // Sample variable lookup method
-        static int VariableLookup(string variableName)
-        {
-            // Provide values for variables
-            if (variableName == "X1") return 7;
-            else
-            {
-                // Handle other variables if needed
-                throw new Exception($"Variable {variableName} not found");
-            }
-        }
-    }
 }
-
+catch (Exception e)
+{
+    Console.WriteLine(e.ToString());
+}
