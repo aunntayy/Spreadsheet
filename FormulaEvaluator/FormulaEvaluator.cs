@@ -1,6 +1,4 @@
 ﻿using System.Collections;
-using System.Numerics;
-using System.Reflection.Metadata.Ecma335;
 using System.Text.RegularExpressions;
 
 namespace FormulaEvaluator
@@ -26,6 +24,11 @@ namespace FormulaEvaluator
 
     public static class Evaluator
     {
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="variable_name"></param>
+        /// <returns></returns>
         public delegate int Lookup(String variable_name);
         /// <summary>
         /// 
@@ -42,20 +45,47 @@ namespace FormulaEvaluator
 
             string[] substrings = Regex.Split(expression, "(\\()|(\\))|(-)|(\\+)|(\\*)|(/)");
 
-
             // Check each substring 
             foreach (string substring in substrings) {
-                //Console.WriteLine($"Processing: {substring}");
-                //if t = "+" or "-"
-                if (substring == "+" || substring == "-")
+                //if t is an integer
+                if (int.TryParse(substring, out int n))
                 {
-                    if (valstack.Count >= 2 && opstack.Count > 0 && (opstack.Peek() == "+" || opstack.Peek() == "-"))
+                    //For mutiply and divine
+                    if (valstack.Count > 0 && opstack.Count > 0 && (opstack.Peek().ToString() == "*" || opstack.Peek().ToString() == "/"))
+                    {
+                        int num1 = (int)valstack.Pop();
+                        int num2 = n;
+                        string op = (string)opstack.Pop();
+                        valstack.Push(math(num1, op, num2));
+                    }
+                    //push t onto value stack
+                    else { valstack.Push(n); }
+                }
+                //if t is a variable
+                else if (Regex.IsMatch(substring, @"[a-zA-Z_]\w*"))
+                {
+                    // Handle variables using the variableEvaluator delegate
+                    int variableValue = variableEvaluator(substring);
+                    //For mutiply and divine
+                    if (valstack.Count > 0 && opstack.Count > 0 && (opstack.Peek().ToString() == "*" || opstack.Peek().ToString() == "/"))
+                    {
+                        int num1 = (int)valstack.Pop();
+                        int num2 = variableValue;
+                        string op = (string)opstack.Pop();
+                        valstack.Push(math(num1, op, num2));
+                    }
+                    //push t onto value stack
+                    else { valstack.Push(variableValue); }
+                }
+                //if t = "+" or "-"
+                else if (substring == "+" || substring == "-")
+                {
+                    if (valstack.Count >=2 && opstack.Count > 0 && (opstack.Peek() == "+" || opstack.Peek() == "-"))
                     {
                         int num1 = (int)valstack.Pop();
                         int num2 = (int)valstack.Pop();
                         string op = (string)opstack.Pop();
-                        valstack.Push(math(num2, op, num1));
-                        
+                        valstack.Push(math(num2, op, num1));  
                     }
                     opstack.Push(substring);
                     
@@ -65,75 +95,47 @@ namespace FormulaEvaluator
                 else if (substring == "*" || substring == "/" || substring == "("){
                     opstack.Push(substring);
                 }
-                //if t is an integer
-                else if (int.TryParse(substring, out int n)) {
-                        //For mutiply and divine
-                        if (valstack.Count > 0 && opstack.Count > 0 && (opstack.Peek() == "*" || opstack.Peek() == "/"))
-                        {
-                            int num1 = (int)valstack.Pop();
-                            int num2 = n;
-                            string op = (string)opstack.Pop();
-                            valstack.Push(math(num1, op, num2));
-                        }
-                        //push t onto value stack
-                        else { valstack.Push(n); }
-                }
+                
                 // if t = ")"
                 else if (substring == ")") {
-                    if (valstack.Count >= 2)
+                    if (valstack.Count >= 1)
                     {
                         //if top is + or "-"
-                        if (opstack.Peek() == "+" || opstack.Peek() == "-")
+                        if (valstack.Count >=1 && opstack.Count > 0 && (opstack.Peek().ToString().Trim() == "+" || opstack.Peek().ToString().Trim() == "-"))
                         {
                             int num1 = (int)valstack.Pop();
                             int num2 = (int)valstack.Pop();
                             string op = (string)opstack.Pop();
-                            valstack.Push(math(num1, op, num2));
-                            if (opstack.Peek() == "(") { opstack.Pop(); } //the top should be "(", pop it
-                            else { throw new Exception("The top is not ( "); };
+                            valstack.Push(math(num2, op, num1));
                         }
-                    }
-                    else { throw new Exception("less an 2 var in valstack"); }
-                    if (valstack.Count >= 2)
-                    {
-                        // If * or / is at the top
-                        if (opstack.Peek() == "*" || opstack.Peek() == "-")
+                        if (opstack.Count == 0 && opstack.Peek().ToString() != "(")
                         {
-                            int num1 = (int)valstack.Pop();
-                            int num2 = (int)valstack.Pop();
-                            string op = (string)opstack.Pop();
-                            valstack.Push(math(num1, op, num2));
+                            throw new Exception("Mismatched parentheses");
                         }
-                    }
-                    else { throw new Exception("less an 2 var in valstack"); }
-                }
-                //if t is a variable
-                else if (Regex.IsMatch(substring, @"[a-zA-Z]+\d+"))
-                {
-                    if (valstack.Count == 0)
-                    {
-                        // Handle variables using the variableEvaluator delegate
-                        int variableValue = variableEvaluator(substring);
-                        //For mutiply and divine
-                        if (opstack.Peek() == "*" || opstack.Peek() == "/")
+                        else
                         {
-                            int num1 = (int)valstack.Pop();
-                            string op = (string)opstack.Pop();
-                            int num2 = variableValue;
-                            valstack.Push(math(num1, op, num2));
+                            opstack.Pop(); // Pop the "("
                         }
-                        //push t onto value stack
-                        else { valstack.Push(variableValue); }
+                        if (valstack.Count >= 2)
+                        {
+                            // If * or / is at the top
+                            if (valstack.Count > 2 && opstack.Count > 0 && (opstack.Peek().ToString().Trim() == "*" || opstack.Peek().ToString().Trim() == "/"))
+                            {
+                                int num1 = (int)valstack.Pop();
+                                int num2 = (int)valstack.Pop();
+                                string op = (string)opstack.Pop();
+                                valstack.Push(math(num2, op, num1));
+                            }
+                        }
                     }
-                    else { throw new Exception("Empty value stack"); }
+                    else {
+                        throw new Exception("less an 2 var in valstack"); }
                 }
                 }
-            //Console.WriteLine($"valstack: [{string.Join(", ", valstack)}]");
-            //Console.WriteLine($"opstack: [{string.Join(", ", opstack)}]");
-            //Console.WriteLine($"Final state: valstack: [{string.Join(", ", valstack)}], opstack: [{string.Join(", ", opstack)}]");
+            //Console.WriteLine($"Final state: valstack: [{string.Join(", ", valstack)}], opstack: [{string.Join(", ", opstack.Cast<object>())}]");
 
             // Process any remaining operators
-            while (opstack.Count > 0)
+            while (opstack.Count > 0 && valstack.Count == 2)
             {
                 int num1 = (int)valstack.Pop();
                 int num2 = (int)valstack.Pop();
