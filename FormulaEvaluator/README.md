@@ -25,6 +25,4 @@ I talked with Aunntay.
 
 # References:
 
-    1. Title of page - URL
-    2. Title of page - URL
-    3. Title of page - URL
+    1. Delegate Usage in the FormulaEvaluator - https://utah.instructure.com/courses/940768/pages/delegate-usage-in-the-formulaevaluator?module_item_id=23582775

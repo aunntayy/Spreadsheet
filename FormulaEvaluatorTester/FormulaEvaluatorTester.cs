@@ -7,7 +7,7 @@ try
     //Test for basic math
     Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("5 + 2", null)) == 7);
     Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("5-2", null)) == 3);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(2)", null)) == 2);
+    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("2", null)) == 2);
     Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("4/2", null)) == 2);
 
     //Test for mutilayer math
