@@ -22,3 +22,5 @@ I talked with Chanphone Visathip.
 # References:
 
     - Lambda expression (=>) operator defines a lambda expression - https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/lambda-operator
+    - More on the lambda - https://www.geeksforgeeks.org/lambda-expressions-in-c-sharp/
+    - 
