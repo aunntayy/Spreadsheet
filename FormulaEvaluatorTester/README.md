@@ -17,8 +17,8 @@ This test go through the basic the to the higher level of math.
 
 # Consulted Peers:
 
-I talked with Aunntay. 
+I talked with Chanphone Visathip. 
 
 # References:
 
-    none.
+    - Lambda expression (=>) operator defines a lambda expression - https://learn.microsoft.com/en-us/dotnet/csharp/language-reference/operators/lambda-operator
