@@ -1,45 +1,71 @@
 ﻿// See https://aka.ms/new-console-template for more information
 
-using FormulaEvaluator;
+using System;
 
-try
+public class FormulaEvaluatorTest
 {
-    //Test for basic math
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("5 + 2", null)) == 7);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("5-2", null)) == 3);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("2", null)) == 2);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("4/2", null)) == 2);
-
-    //Test for mutilayer math
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(3-1)*2", null)) == 4);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("2*(3-1)", null)) == 4);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(3-1)/2", null)) == 1);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(6/2)*2", null)) == 6);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(6)", null)) == 6);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(2+3)/5", null)) == 1);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("2+1*4", null)) == 6);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(2+1)*4", null)) == 12);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("2/1*4", null)) == 8);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("2 + 4", null)) == 6);
-    
-    // Test for varible with assigned value 
-    // Define a Lookup delegate to provide values for variables
-    FormulaEvaluator.Evaluator.Lookup variableLookup = (variableValue) =>
+    public static void Main()
     {
-        if (variableValue == "x") return 2;
-        else if (variableValue == "y")
+        TestBasicMath();
+        TestMultiLayerMath();
+        TestVariablesWithAssignedValue();
+    }
+
+    private static void TestExpression(string input, int expected_result, FormulaEvaluator.Evaluator.Lookup variableLookup = null)
+    {
+        try
         {
-            return 3;
+            int result = FormulaEvaluator.Evaluator.Evaluate(input, variableLookup);
+            Console.WriteLine(result == expected_result);
         }
-        else if (variableValue == "A200") { return 3; }
-        else throw new ArgumentException($"Variable {variableValue} not found.");
-    };
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("x*y", variableLookup)) == 6);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("x+y", variableLookup)) == 5);
-    Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("x/y", variableLookup)) == 0);
-    //Console.WriteLine((FormulaEvaluator.Evaluator.Evaluate("(x+A200)*2/5", variableLookup)) == 2);
-}
-catch (Exception e)
-{
-    Console.WriteLine(e.ToString());
+        catch (Exception e)
+        {
+            Console.WriteLine(e.ToString());
+        }
+    }
+
+    private static void TestBasicMath()
+    {
+        Console.WriteLine("Testing Basic Math:");
+        TestExpression("5 + 2", 7);
+        TestExpression("5-2", 3);
+        TestExpression("2", 2);
+        TestExpression("4/2", 2);
+        TestExpression("4-2",2);
+    }
+
+    private static void TestMultiLayerMath()
+    {
+        Console.WriteLine("Testing Multi-Layer Math:");
+        TestExpression("(3-1)*2", 4);
+        TestExpression("2*(3-1)", 4);
+        TestExpression("(3-1)/2", 1);
+        TestExpression("(6/2)*2", 6);
+        TestExpression("(6)", 6);
+        TestExpression("(2+3)/5", 1);
+        TestExpression("2+1*4", 6);
+        TestExpression("(2+1)*4", 12);
+        TestExpression("2/1*4", 8);
+        TestExpression("2 + 4", 6);
+    }
+
+    private static void TestVariablesWithAssignedValue()
+    {
+        Console.WriteLine("Testing Variables with Assigned Value:");
+        FormulaEvaluator.Evaluator.Lookup variableLookup = (variableValue) =>
+        {
+            if (variableValue == "X1") return 2;
+            else if (variableValue == "Y1") return 3;
+            //wrong variable name
+            else if (variableValue == "A200B1") return 3;
+            else throw new Exception($"Variable {variableValue} not found.");
+        };
+
+        TestExpression("X1*Y1", 6, variableLookup);
+        TestExpression("X1+Y1", 5, variableLookup);
+        TestExpression("X1/Y1", 0, variableLookup);
+        //Wrong variable name and unassigned variable
+        TestExpression("(X1+A200B1)*2/5", 2, variableLookup);
+        TestExpression("(X1+A1)*2/5", 2, variableLookup);
+    }
 }

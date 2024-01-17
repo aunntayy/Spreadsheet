@@ -64,6 +64,8 @@ namespace FormulaEvaluator
                 //if t is a variable
                 else if (Regex.IsMatch(substring, @"[a-zA-Z_]\w*"))
                 {
+                    if (Regex.IsMatch(substring, @"^[a-zA-Z]+\d+$") == false)
+                    { throw new Exception("Not a valid varible name"); }
                     // Handle variables using the variableEvaluator delegate
                     int variableValue = variableEvaluator(substring);
                     //For mutiply and divine
@@ -90,12 +92,10 @@ namespace FormulaEvaluator
                     opstack.Push(substring);
                     
                 }
-                
                 //if t = "*", "/", "("
                 else if (substring == "*" || substring == "/" || substring == "("){
                     opstack.Push(substring);
                 }
-                
                 // if t = ")"
                 else if (substring == ")") {
                     if (valstack.Count >= 1)
@@ -132,7 +132,6 @@ namespace FormulaEvaluator
                         throw new Exception("less an 2 var in valstack"); }
                 }
                 }
-            //Console.WriteLine($"Final state: valstack: [{string.Join(", ", valstack)}], opstack: [{string.Join(", ", opstack.Cast<object>())}]");
 
             // Process any remaining operators
             while (opstack.Count > 0 && valstack.Count == 2)
@@ -151,7 +150,7 @@ namespace FormulaEvaluator
             }
             else
             {
-                throw new Exception("Invalid expression or incomplete evaluation");
+                throw new Exception("Invalid input or incomplete math work");
             }
         }
         
