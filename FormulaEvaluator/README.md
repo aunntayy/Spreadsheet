@@ -3,8 +3,8 @@ Author:     Phuc Hoang
 Partner:    None
 Course:     CS 3500, University of Utah, School of Computing
 GitHub ID:  PhucHoang123
-Repo:       https://github.com/Utah-School-of-Computing-de-St-Germain 
-Date:       1/17/2023
+Repo:       https://github.com/uofu-cs3500-spring24/spreadsheet-PhucHoang123
+Date:       1/16/2023 11:25pm
 Project:    Formula Evaluator
 Copyright:  CS 3500 and [Phuc Hoang] - This work may not be copied for use in Academic Coursework.
 ```
