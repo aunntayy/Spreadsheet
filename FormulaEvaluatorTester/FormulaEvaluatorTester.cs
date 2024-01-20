@@ -28,7 +28,12 @@ public class FormulaEvaluatorTest
         TestMultiLayerMath();
         TestVariablesWithAssignedValue();
     }
-
+    /// <summary>
+    /// 
+    /// </summary>
+    /// <param name="input"></param>
+    /// <param name="expected_result"></param>
+    /// <param name="variableLookup"></param>
     private static void TestExpression(string input, int expected_result, FormulaEvaluator.Evaluator.Lookup variableLookup = null)
     {
         try
@@ -41,7 +46,9 @@ public class FormulaEvaluatorTest
             Console.WriteLine(e.ToString());
         }
     }
-
+    /// <summary>
+    ///  Test for basic math
+    /// </summary>
     private static void TestBasicMath()
     {
         Console.WriteLine("Testing Basic Math:");
@@ -50,8 +57,15 @@ public class FormulaEvaluatorTest
         TestExpression("2", 2);
         TestExpression("4/2", 2);
         TestExpression("4-2",2);
-    }
+        TestExpression("", 0);
 
+        // Invalid expression
+        TestExpression("-2", -2);
+        TestExpression("25*",25);
+    }
+    /// <summary>
+    /// Test for multilayerMath
+    /// </summary>
     private static void TestMultiLayerMath()
     {
         Console.WriteLine("Testing Multi-Layer Math:");
@@ -65,8 +79,17 @@ public class FormulaEvaluatorTest
         TestExpression("(2+1)*4", 12);
         TestExpression("2/1*4", 8);
         TestExpression("2 + 4", 6);
-    }
+        // Invalid expression
+        TestExpression("()0", 0);
+        TestExpression("(2+2(", 6);
+        TestExpression("2_", 8);
+        TestExpression("(2*3))", 6);
 
+    }
+    /// <summary>
+    /// Test Varible with assigned value 
+    /// </summary>
+    /// <exception cref="Exception"></exception>
     private static void TestVariablesWithAssignedValue()
     {
         Console.WriteLine("Testing Variables with Assigned Value:");
@@ -76,15 +99,19 @@ public class FormulaEvaluatorTest
             else if (variableValue == "Y1") return 3;
             //wrong variable name
             else if (variableValue == "A200B1") return 3;
+            else if (variableValue == "2A") return 3;
+            else if (variableValue == "AA1") return 3;
             else throw new Exception($"Variable {variableValue} not found.");
         };
 
         TestExpression("X1*Y1", 6, variableLookup);
         TestExpression("X1+Y1", 5, variableLookup);
         TestExpression("X1/Y1", 0, variableLookup);
+
         //Wrong variable name and unassigned variable
-        //Comment that part out because I want to see all true
-        //TestExpression("(X1+A200B1)*2/5", 2, variableLookup);
-        //TestExpression("(X1+A1)*2/5", 2, variableLookup);
+        TestExpression("(X1+A200B1)*2/5", 2, variableLookup);
+        TestExpression("(X1+A1)*2/5", 2, variableLookup);
+        TestExpression("(X1+AA1)*2/5", 2, variableLookup);
+        TestExpression("(X1+2A)*2/5", 2, variableLookup);
     }
 }

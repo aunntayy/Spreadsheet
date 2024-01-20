@@ -25,13 +25,13 @@ namespace FormulaEvaluator
     public static class Evaluator
     {
         /// <summary>
-        /// 
+        /// Delegate to look up varible assigned value
         /// </summary>
         /// <param name="variable_name"></param>
         /// <returns></returns>
         public delegate int Lookup(String variable_name);
         /// <summary>
-        /// 
+        /// Algorithm for the infix notation
         /// </summary>
         /// <param name="expression"></param>
         /// <param name="variableEvaluator"></param>
@@ -46,7 +46,9 @@ namespace FormulaEvaluator
             string[] substrings = Regex.Split(expression, "(\\()|(\\))|(-)|(\\+)|(\\*)|(/)");
 
             // Check each substring 
-            foreach (string substring in substrings) {
+            foreach (string substring 
+                
+                in substrings) {
                 //if t is an integer
                 if (int.TryParse(substring, out int n))
                 {
@@ -153,7 +155,14 @@ namespace FormulaEvaluator
                 throw new Exception("Invalid input or incomplete math work");
             }
         }
-        
+        /// <summary>
+        /// Method to do the math work depend on the operation
+        /// </summary>
+        /// <param name="num1"></param>
+        /// <param name="op"></param>
+        /// <param name="num2"></param>
+        /// <returns></returns>
+        /// <exception cref="DivideByZeroException"></exception>
         private static int math(int num1, string op, int num2)
         {
             int value = 0;
