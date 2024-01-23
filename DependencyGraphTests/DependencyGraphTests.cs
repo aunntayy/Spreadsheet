@@ -61,7 +61,11 @@ namespace DevelopmentTests
             Assert.AreEqual(t.Size, 1);
             t.RemoveDependency("x", "y");
             t.ReplaceDependents("x", new HashSet<string>());
-            t.ReplaceDependees("y", new HashSet<string>());
+            t.ReplaceDependees("y", new HashSet<string>(){"e"});
+            Assert.AreEqual(t.Size, 0);
+            t.ReplaceDependents("", new HashSet<string>());
+            t.ReplaceDependees("e", new HashSet<string>(){"x"});
+            Assert.AreEqual(t.Size, 0);
         }
         ///<summary>
         ///It should be possibe to have more than one DG at a time.
@@ -126,8 +130,11 @@ namespace DevelopmentTests
             DependencyGraph t = new DependencyGraph();
             t.AddDependency("x", "b");
             t.AddDependency("a", "z");
+            Assert.AreEqual(2, t.Size);
             t.ReplaceDependents("b", new HashSet<string>());
+            Assert.AreEqual(2, t.Size);
             t.AddDependency("y", "b");
+            Assert.AreEqual(3, t.Size);
             t.ReplaceDependents("a", new HashSet<string>() { "c" });
             t.AddDependency("w", "d");
             t.ReplaceDependees("b", new HashSet<string>() { "a", "c" });
