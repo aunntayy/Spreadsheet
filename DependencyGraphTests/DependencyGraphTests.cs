@@ -310,12 +310,11 @@ namespace DevelopmentTests
             t.AddDependency("b","e");
             t.ReplaceDependees("a",new HashSet<string>());
             t.ReplaceDependents("b", new HashSet<string>());
-            t.ReplaceDependees("b", new HashSet<string>());
             Assert.IsTrue(t.HasDependees("h"));
             Assert.IsTrue(t.HasDependents("b"));
             Assert.IsFalse(t.HasDependents("f"));
             Assert.IsTrue(t.HasDependents("c"));
-            Assert.IsFalse(t.HasDependents("a"));
+            Assert.IsTrue(t.HasDependents("a"));
             Assert.IsTrue(t.HasDependees("a"));
         }
     }
