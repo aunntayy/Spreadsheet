@@ -47,6 +47,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public DependencyGraph()
         {
+            //Declare var
             dependents = new Dictionary<string, HashSet<string>>();
             dependees = new Dictionary<string, HashSet<string>>();  
     }
@@ -58,6 +59,8 @@ namespace SpreadsheetUtilities
             get
             {
                 int size = 0;
+                //Count the number of pair of dependent
+                //since it is a mirror structure so they should have the same size 
                 foreach (var pair in dependents) { size += pair.Value.Count; }
                 return size;
             }
@@ -73,7 +76,12 @@ namespace SpreadsheetUtilities
         {
             get
             {
-                return dependents[s].Count;
+                //Count the dependees of a dependent
+                if (dependents.ContainsKey(s))
+                {
+                    return dependents[s].Count;
+                }
+                else { return 0; }
             }
         }
         /// <summary>
@@ -81,20 +89,21 @@ namespace SpreadsheetUtilities
         /// </summary>
         public bool HasDependents(string s)
         {
-            return dependents.ContainsKey(s);
+            return dependees.ContainsKey(s);
         }
         /// <summary>
         /// Reports whether dependees(s) is non-empty.
         /// </summary>
         public bool HasDependees(string s)
         {
-            return dependees.ContainsKey(s);
+            return dependents.ContainsKey(s);
         }
         /// <summary>
         /// Enumerates dependents(s).
         /// </summary>
         public IEnumerable<string> GetDependents(string s)
         {
+            //Check if dependee contain key
             if (dependees.ContainsKey(s))
             {
                  return dependees[s];
@@ -106,6 +115,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<string> GetDependees(string s)
         {
+            //Check if dependent contain key
             if (dependents.ContainsKey(s))
             {
                 return dependents[s];
@@ -151,7 +161,7 @@ namespace SpreadsheetUtilities
             //check if they exist
             if (dependents.ContainsKey(t) && dependees.ContainsKey(s))
             {
-                //remove each one
+                //remove the value
                 dependents[t].Remove(s);
                 dependees[s].Remove(t);
                 //check if s not exist in dependents => remove
@@ -169,17 +179,19 @@ namespace SpreadsheetUtilities
             //check to see if s exist in dictionary dependents
             if (dependees.ContainsKey(s)) 
             { 
-                //remove all s from dependent
                 foreach (var existDependees in dependees[s].ToList()) 
-                { 
+                {
+                    //In case the value is ""
                     if (newDependents.Count() == 0)
                     {
-                        RemoveDependency(s, existDependees);
-                        AddDependency(s,"");
+                        //remove the exist dependee then add ""
+                        RemoveDependency(existDependees, s);
+                        AddDependency("", s);
                     }
                     foreach (var newDependees in newDependents)
                     {
                         {
+                            //remove the exist dependee then add the new one
                             RemoveDependency(s, existDependees);
                             AddDependency(s, newDependees);
                         }
@@ -198,20 +210,24 @@ namespace SpreadsheetUtilities
             if (dependents.ContainsKey(s)) 
             {
                 //remove all s from dependees
-                foreach (var existDependents in dependents[s].ToList()) 
+                foreach (var existDependents in dependents[s].ToList())
                 {
-                    if (newDependees.Count() == 0)
                     {
-                        RemoveDependency(existDependents, s);
-                        AddDependency("", s);
-                    }
-                    foreach (var newDependents in newDependees)
-                    {
-                        RemoveDependency(existDependents, s);
-                        AddDependency(newDependents, s);
+                        //In case the value is ""
+                        if (newDependees.Count() == 0)
+                        {
+                            //remove the exist dependent then add ""
+                            RemoveDependency(existDependents, s);
+                            AddDependency(s, "");
+                        }
+                        foreach (var newDependents in newDependees)
+                        {
+                            //remove the exist dependent then add the new one
+                            RemoveDependency(existDependents, s);
+                            AddDependency(newDependents, s);
+                        }
                     }
                 }
-                //add in the new dependees
                 
             }
         }

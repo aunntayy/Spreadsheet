@@ -18,3 +18,4 @@ Future extensions will be added
 # Time Expenditures:
 
     1. Assignment One:   Predicted Hours:          10        Actual Hours:   7
+    2. Assignment Two:   Predicted Hours:          20        Actual Hours:   9

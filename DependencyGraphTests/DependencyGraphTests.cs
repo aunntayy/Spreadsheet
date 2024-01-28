@@ -61,10 +61,10 @@ namespace DevelopmentTests
             Assert.AreEqual(t.Size, 1);
             t.RemoveDependency("x", "y");
             t.ReplaceDependents("x", new HashSet<string>());
-            t.ReplaceDependees("y", new HashSet<string>(){"e"});
+            t.ReplaceDependees("y", new HashSet<string>() { "e" });
             Assert.AreEqual(t.Size, 0);
             t.ReplaceDependents("", new HashSet<string>());
-            t.ReplaceDependees("e", new HashSet<string>(){"x"});
+            t.ReplaceDependees("e", new HashSet<string>() { "x" });
             Assert.AreEqual(t.Size, 0);
         }
         ///<summary>
@@ -228,6 +228,75 @@ namespace DevelopmentTests
                 Assert.IsTrue(dees[i].SetEquals(new
                 HashSet<string>(t.GetDependees(letters[i]))));
             }
+        }
+        /// <summary>
+        /// Simple test for fuction that return the size dependees 
+        /// </summary>
+        [TestMethod]
+        public void SizeOfDepedees() {
+            DependencyGraph t = new DependencyGraph();
+            t.AddDependency("b", "a");
+            t.AddDependency("c", "b");
+            t.AddDependency("e", "b");
+            t.AddDependency("c", "d");
+            t.AddDependency("d", "e");
+            Assert.AreEqual(1, t["a"]);
+            Assert.AreEqual(2, t["b"]);
+            Assert.AreEqual(1, t["e"]);
+            Assert.AreEqual(0, t["z"]);
+            Assert.AreNotEqual(1, t["c"]);
+        }
+        /// <summary>
+        /// Check if dependents exist
+        /// </summary>
+        [TestMethod]
+        public void SimpleHasDenpentsTest(){
+            DependencyGraph t = new DependencyGraph();
+            t.AddDependency("b", "a");
+            t.AddDependency("c", "b");
+            t.AddDependency("e", "b");
+            t.AddDependency("c", "d");
+            t.AddDependency("d", "e");
+            Assert.IsTrue(t.HasDependents("b"));
+            Assert.IsTrue(t.HasDependents("c"));
+
+        }
+        /// <summary>
+        /// Check if dependees exist
+        /// </summary>
+        [TestMethod]
+        public void SimpleHasDenpendeesTest()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.AddDependency("b", "a");
+            t.AddDependency("c", "b");
+            t.AddDependency("e", "b");
+            t.AddDependency("c", "d");
+            t.AddDependency("d", "e");
+            Assert.IsTrue(t.HasDependees("b"));
+            Assert.IsFalse(t.HasDependees("c"));
+        }
+        /// <summary>
+        /// replace blank dependees or dependents value
+        /// </summary>
+        [TestMethod]
+        public void MoreComplexHasDependeesTest()
+        {
+            DependencyGraph t = new DependencyGraph();
+            t.AddDependency("a", "b");
+            t.AddDependency("c", "d");
+            t.AddDependency("e", "f");
+            t.AddDependency("g", "h");
+            t.AddDependency("z", "a");
+            t.AddDependency("b","e");
+            t.ReplaceDependees("a",new HashSet<string>());
+            t.ReplaceDependents("b", new HashSet<string>());
+            t.ReplaceDependees("b", new HashSet<string>());
+            Assert.IsTrue(t.HasDependees("h"));
+            Assert.IsTrue(t.HasDependents("b"));
+            Assert.IsFalse(t.HasDependents("f"));
+            Assert.IsFalse(t.HasDependees("c"));
+            Assert.IsTrue(t.HasDependents("a"));
         }
     }
 }
