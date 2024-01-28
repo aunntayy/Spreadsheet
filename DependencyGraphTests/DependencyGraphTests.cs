@@ -5,6 +5,25 @@ using SpreadsheetUtilities;
 namespace DevelopmentTests
 {
     /// <summary>
+    /// Author:    Phuc Hoang
+    /// Partner:   -None-
+    /// Date:      1-Jan-2024
+    /// Course:    CS 3500, University of Utah, School of Computing
+    /// Copyright: CS 3500 and Phuc Hoang - This work may not 
+    ///            be copied for use in Academic Coursework.
+    ///
+    /// I, Phuc Hoang, certify that I wrote this code from scratch and
+    /// did not copy it in part or whole from another source.  All 
+    /// references used in the completion of the assignments are cited 
+    /// in my README file.
+    ///
+    /// File Contents
+    ///
+    ///    [This is a test for dependcy graph]
+    ///    
+    /// </summary>
+    
+    /// <summary>
     ///This is a test class for DependencyGraphTest and is intended
     ///to contain all DependencyGraphTest Unit Tests
     ///</summary>
@@ -280,7 +299,7 @@ namespace DevelopmentTests
         /// replace blank dependees or dependents value
         /// </summary>
         [TestMethod]
-        public void MoreComplexHasDependeesTest()
+        public void Complex_HasDependees_or_DependentsTest()
         {
             DependencyGraph t = new DependencyGraph();
             t.AddDependency("a", "b");
@@ -295,8 +314,9 @@ namespace DevelopmentTests
             Assert.IsTrue(t.HasDependees("h"));
             Assert.IsTrue(t.HasDependents("b"));
             Assert.IsFalse(t.HasDependents("f"));
-            Assert.IsFalse(t.HasDependees("c"));
-            Assert.IsTrue(t.HasDependents("a"));
+            Assert.IsTrue(t.HasDependents("c"));
+            Assert.IsFalse(t.HasDependents("a"));
+            Assert.IsTrue(t.HasDependees("a"));
         }
     }
 }

@@ -11,6 +11,26 @@ using System.Text;
 namespace SpreadsheetUtilities
 {
     /// <summary>
+    /// Author:    Phuc Hoang
+    /// Partner:   -None-
+    /// Date:      1-Jan-2024
+    /// Course:    CS 3500, University of Utah, School of Computing
+    /// Copyright: CS 3500 and Phuc Hoang - This work may not 
+    ///            be copied for use in Academic Coursework.
+    ///
+    /// I, Phuc Hoang, certify that I wrote this code from scratch and
+    /// did not copy it in part or whole from another source.  All 
+    /// references used in the completion of the assignments are cited 
+    /// in my README file.
+    ///
+    /// File Contents
+    ///
+    ///    [This is a dependcy graph that keep track if a value depend on another value or if any value depend on it.
+    ///    It will help with deciding which value will be compute first]
+    ///    
+    /// </summary>
+ 
+    /// <summary>
     /// (s1,t1) is an ordered pair of strings
     /// t1 depends on s1; s1 must be evaluated before t1
     ///
@@ -186,7 +206,7 @@ namespace SpreadsheetUtilities
                     {
                         //remove the exist dependee then add ""
                         RemoveDependency(existDependees, s);
-                        AddDependency("", s);
+                        AddDependency(s, "");
                     }
                     foreach (var newDependees in newDependents)
                     {
@@ -218,7 +238,7 @@ namespace SpreadsheetUtilities
                         {
                             //remove the exist dependent then add ""
                             RemoveDependency(existDependents, s);
-                            AddDependency(s, "");
+                            AddDependency("", s);
                         }
                         foreach (var newDependents in newDependees)
                         {
