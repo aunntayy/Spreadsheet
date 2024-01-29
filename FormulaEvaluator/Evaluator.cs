@@ -1,4 +1,5 @@
 ﻿using System.Collections;
+using System.Collections.Generic;
 using System.Text.RegularExpressions;
 
 namespace FormulaEvaluator
@@ -46,9 +47,7 @@ namespace FormulaEvaluator
             string[] substrings = Regex.Split(expression, "(\\()|(\\))|(-)|(\\+)|(\\*)|(/)");
 
             // Check each substring 
-            foreach (string substring 
-                
-                in substrings) {
+            foreach (string substring in substrings) {
                 //if t is an integer
                 if (int.TryParse(substring, out int n))
                 {
@@ -64,10 +63,10 @@ namespace FormulaEvaluator
                     else { valstack.Push(n); }
                 }
                 //if t is a variable
-                else if (Regex.IsMatch(substring, @"[a-zA-Z_]\w*"))
+                if (Regex.IsMatch(substring, @"[a-zA-Z_]\w*"))
                 {
                     if (Regex.IsMatch(substring, @"^[a-zA-Z]+\d+$") == false)
-                    { throw new Exception("Not a valid varible name"); }
+                    { throw new ArgumentException("Not a valid varible name"); }
                     // Handle variables using the variableEvaluator delegate
                     int variableValue = variableEvaluator(substring);
                     //For mutiply and divine
@@ -82,61 +81,70 @@ namespace FormulaEvaluator
                     else { valstack.Push(variableValue); }
                 }
                 //if t = "+" or "-"
-                else if (substring == "+" || substring == "-")
-                {
-                    if (valstack.Count >=2 && opstack.Count > 0 && (opstack.Peek() == "+" || opstack.Peek() == "-"))
-                    {
-                        int num1 = (int)valstack.Pop();
-                        int num2 = (int)valstack.Pop();
-                        string op = (string)opstack.Pop();
-                        valstack.Push(math(num2, op, num1));  
-                    }
-                    opstack.Push(substring);
-                    
-                }
-                //if t = "*", "/", "("
-                else if (substring == "*" || substring == "/" || substring == "("){
-                    opstack.Push(substring);
-                }
-                // if t = ")"
-                else if (substring == ")") {
-                    if (valstack.Count >= 1)
-                    {
-                        //if top is + or "-"
-                        if (valstack.Count >=1 && opstack.Count > 0 && (opstack.Peek().ToString().Trim() == "+" || opstack.Peek().ToString().Trim() == "-"))
+                if (substring == "+" || substring == "-") {
+                    if (valstack.Count == 2 && opstack.Count > 0 && (opstack.Peek().Equals("+")  || opstack.Peek().Equals("-"))) {
+                        if (opstack.Peek().Equals("+"))
                         {
                             int num1 = (int)valstack.Pop();
                             int num2 = (int)valstack.Pop();
                             string op = (string)opstack.Pop();
-                            valstack.Push(math(num2, op, num1));
+                            valstack.Push(math(num1, op, num2));
                         }
-                        if (opstack.Count == 0 && opstack.Peek().ToString() != "(")
+                        else if (opstack.Peek().Equals("-"))
                         {
-                            throw new Exception("Mismatched parentheses");
-                        }
-                        else
-                        {
-                            opstack.Pop(); // Pop the "("
-                        }
-                        if (valstack.Count >= 2)
-                        {
-                            // If * or / is at the top
-                            if (valstack.Count > 2 && opstack.Count > 0 && (opstack.Peek().ToString().Trim() == "*" || opstack.Peek().ToString().Trim() == "/"))
-                            {
-                                int num1 = (int)valstack.Pop();
-                                int num2 = (int)valstack.Pop();
-                                string op = (string)opstack.Pop();
-                                valstack.Push(math(num2, op, num1));
-                            }
+                            int num1 = (int)valstack.Pop();
+                            int num2 = (int)valstack.Pop();
+                            string op = (string)opstack.Pop();
+                            valstack.Push(num2 - num1);
                         }
                     }
-                    else {
-                        throw new Exception("less an 2 var in valstack"); }
+                    opstack.Push(substring);
                 }
+                //if t = "*", "/", "("
+                if (substring == "*" || substring == "/" || substring == "("){
+                    opstack.Push(substring);
                 }
 
+                // if t = ")"
+                if (substring == ")")
+                {
+                    // Check if there are operands in the stack
+                    if (valstack.Count < 1)
+                    {
+                        throw new ArgumentException("Less than 1 operand found before closing parenthesis");
+                    }
+
+                    // Evaluate expressions inside parentheses
+                    while (opstack.Count > 0 && opstack.Peek().ToString() != "(")
+                    {
+                        int num1 = valstack.Pop();
+                        int num2 = valstack.Pop();
+                        string op = opstack.Pop().ToString();
+                        valstack.Push(math(num2, op, num1));
+                    }
+                    if (opstack.Count == 0)
+                    {
+                        throw new ArgumentException("A '(' is not found where expected");
+                    }
+                    else
+                    {
+                        opstack.Pop();
+                    }
+
+                    // Check if there are additional operators (* or /) after parentheses
+                    if (opstack.Count > 0 && (opstack.Peek().ToString().Trim() == "*" || opstack.Peek().ToString().Trim() == "/"))
+                    {
+                        int num1 = valstack.Pop();
+                        int num2 = valstack.Pop();
+                        string op = opstack.Pop().ToString();
+                        valstack.Push(math(num2, op, num1));
+                    }
+                }
+
+            }
+
             // Process any remaining operators
-            while (opstack.Count > 0 && valstack.Count == 2)
+            while (opstack.Count > 0 && valstack.Count >= 2)
             {
                 int num1 = (int)valstack.Pop();
                 int num2 = (int)valstack.Pop();
@@ -152,7 +160,7 @@ namespace FormulaEvaluator
             }
             else
             {
-                throw new Exception("Invalid input or incomplete math work");
+                throw new ArgumentException("Invalid input or incomplete math work");
             }
         }
         /// <summary>
@@ -169,7 +177,7 @@ namespace FormulaEvaluator
             if (op == "+") { value = num1 + num2;}
             else if (op == "-") {  value = num1 - num2;}
             else if (op == "*") {  value = num1 * num2;}
-            else if (op == "/") { if (num2 == 0) { throw new DivideByZeroException("Cannot divine by zero"); } else { value = num1 / num2; } } 
+            else if (op == "/") { if (num2 == 0) { throw new ArgumentException("Cannot divine by zero"); } else { value = num1 / num2; } } 
             return value;
         }
     }
