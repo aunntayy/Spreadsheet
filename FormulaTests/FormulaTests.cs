@@ -55,6 +55,26 @@ namespace FormulaTests
         {
             Formula f = new Formula("(3+1");
         }
+        [TestMethod]
+        public void SimpleDivineByZeroTest()
+        {
+            Formula f = new Formula("1/0");
+            Assert.IsInstanceOfType(f.Evaluate( s => 0), typeof(FormulaError));
+        }
+
+        [TestMethod]
+        public void DivindeByZeroWithParenthesisTest()
+        {
+            Formula f = new Formula("(1+1)/0");
+            Assert.IsInstanceOfType(f.Evaluate(s => 0), typeof(FormulaError));
+        }
+
+        [TestMethod]
+        public void ComplexDivindeByZeroTest() 
+        {
+            Formula f = new Formula("(1 + X1) / (X1 - 12)");
+            Assert.IsInstanceOfType(f.Evaluate(s => 12), typeof(FormulaError));
+        }
 
         [TestMethod]
         [ExpectedException(typeof(FormulaFormatException))]
@@ -104,5 +124,7 @@ namespace FormulaTests
             string formula = f.ToString();
             Assert.AreEqual("B1+A1", formula);
         }
+
+
     }
 }

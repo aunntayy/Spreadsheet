@@ -233,7 +233,7 @@ namespace SpreadsheetUtilities
                             double num1 = (double)valstack.Pop();
                             double num2 = n;
                             string op = (string)opstack.Pop();
-                            if (num1 == 0 && op == "/")
+                            if (num2 == 0 && op == "/")
                             {
                                 return new FormulaError("Cannot divine by zero");
                             }
@@ -427,7 +427,11 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override bool Equals(object? obj)
             {
+            //If obj is null or obj is not a Formula, returns false.
+            if (obj == null || obj.GetType() != this.GetType())
+                {
                 return false;
+                }
             }
         /// <summary>
         /// <change> We are now using Non-Nullable objects. Thus neither f1 nor f2 can be null!</change>
