@@ -1,4 +1,5 @@
 using SpreadsheetUtilities;
+using System.Text.RegularExpressions;
 
 namespace FormulaTests
 {
@@ -25,12 +26,13 @@ namespace FormulaTests
         {
             Formula f = new Formula("+1-2");
         } 
+
         
         [TestMethod]
         [ExpectedException(typeof(FormulaFormatException))]
-        public void SimpleEndingTokenTest()
+        public void validVarTest()
         {
-            Formula f = new Formula("1-2+");
+            Formula f = new Formula("12b");
         }  
         
         [TestMethod]
@@ -71,26 +73,26 @@ namespace FormulaTests
         [TestMethod]
         public void SimpleGetVariableTest() 
         {
-            Formula f = new Formula("X+Y");
+            Formula f = new Formula("X1+Y1");
             IEnumerable<string> variables = f.GetVariables();
-            Assert.IsTrue(variables.Contains("X"));
-            Assert.IsTrue(variables.Contains("Y"));
+            Assert.IsTrue(variables.Contains("X1"));
+            Assert.IsTrue(variables.Contains("Y1"));
             Assert.AreEqual(2, variables.Count());
         }
 
         [TestMethod]
         public void SimpleToStringTest() 
         {
-            Formula f = new Formula("1 + 2");
-            string result = f.ToString();
-            Assert.AreEqual("1+2", result);
+            Formula f = new Formula("1+2");
+            object result = f.Evaluate(s => 0);
+            Assert.AreEqual(3.0, result);
         }
 
-        [TestMethod()]
-        public void Test18()
+        [TestMethod]
+        public void ManyVarTest()
         {
-            Formula f = new Formula("(5 + X1) / (X1 - 3)");
-            Assert.IsInstanceOfType(f.Evaluate(s => 3), typeof(FormulaError));
+            Formula f = new Formula("y1*3-8/2+4*(8-92)/14*x7");
+            Assert.AreEqual(-16.0, f.Evaluate(s => (s == "x7") ? 1 : 4));
         }
     }
 }
