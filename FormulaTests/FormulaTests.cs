@@ -94,5 +94,15 @@ namespace FormulaTests
             Formula f = new Formula("y1*3-8/2+4*(8-92)/14*x7");
             Assert.AreEqual(-16.0, f.Evaluate(s => (s == "x7") ? 1 : 4));
         }
+
+        [TestMethod()]
+        public void Test3()
+        {
+            Formula f = new Formula("B1 + a1", x => x.ToUpper(), x => true);
+            IEnumerable<string> variables = f.GetVariables();
+            Assert.IsTrue(variables.Contains("A1"));
+            string formula = f.ToString();
+            Assert.AreEqual("B1+A1", formula);
+        }
     }
 }

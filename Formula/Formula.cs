@@ -190,12 +190,7 @@ namespace SpreadsheetUtilities
         //Check for valid variable
         private bool isVar(string token)
         {
-            if (Regex.IsMatch(token, @"[a-zA-Z_]\w*"))
-            {
-                if (Regex.IsMatch(token, @"^[a-zA-Z_]([0-9a-zA-Z_]+)?$") == false)
-                { return false; }
-            }
-            return true;
+            return Regex.IsMatch(token, @"^[a-zA-Z_][a-zA-Z0-9_]*$");
         }
 
 
@@ -381,11 +376,10 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<String> GetVariables()
         {
-            List<string> Variables = new List<string>(normVar);
-            return Variables;
+            List<string> variables = normVar.Where(token => isVar(token)).ToList();
+            return variables;
         }
 
-        
 
         /// <summary>
         /// Returns a string containing no spaces which, if passed to the Formula
