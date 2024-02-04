@@ -150,7 +150,7 @@ namespace SpreadsheetUtilities
                         if (!Regex.IsMatch(nextToken, validTokenPattern))
                         {
                             throw new FormulaFormatException("Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.");
-                        }
+                        } 
                     }
                     //Extra following rule
                     if (Regex.IsMatch(currentToken, extraFollowRule)) 
@@ -253,7 +253,7 @@ namespace SpreadsheetUtilities
                             double num1 = (double)valstack.Pop();
                             double num2 = variableValue;
                             string op = (string)opstack.Pop();
-                            if (num1 == 0 && op == "/")
+                            if (num2 == 0 && op == "/")
                             {
                                 return new FormulaError("Cannot divine by zero");
                             }
@@ -335,16 +335,8 @@ namespace SpreadsheetUtilities
                     }
                     valstack.Push(math(num2, op, num1));
                 }
-
-                //return the value
-                if (valstack.Count == 1 && opstack.Count == 0)
-                {
                     double finalVal = (double)valstack.Pop();
                     return finalVal;
-                }
-                else return 0;
-
-                
             }
         /// <summary>
         /// Method to do the math work depend on the operation
