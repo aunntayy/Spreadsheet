@@ -58,7 +58,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public Formula(String formula) : this(formula, s => s, s => true)
         {
-            
+
         }
         /// <summary>
         /// Creates a Formula from a string that consists of an infix expression written as
@@ -83,102 +83,104 @@ namespace SpreadsheetUtilities
         /// new Formula("2x+y3", N, V) should throw an exception, since "2x+y3" is syntactically incorrect.
         /// </summary>
         public Formula(String formula, Func<string, string> normalize, Func<string, bool> isValid)
-            {
+        {
 
-                tokens = GetTokens(formula).ToList();
-                
+            tokens = GetTokens(formula).ToList();
+
 
 
             //Specific token Rule
             string specificRule = @"^(\(|\)|\+|-|\*|\/|[a-zA-Z_][a-zA-Z0-9_]*|[-+]?\d*\.?\d+([eE][-+]?\d+)?)$";
-                if (!tokens.TrueForAll(token => Regex.IsMatch(token, specificRule))) 
-                { 
-                    throw new FormulaFormatException("Invalid input"); 
-                }
+            if (!tokens.TrueForAll(token => Regex.IsMatch(token, specificRule)))
+            {
+                throw new FormulaFormatException("Invalid input");
+            }
 
-                // One Token rule
-                if (tokens.Count == 0)
-                {
-                    throw new FormulaFormatException("Need to have at least 1 valid token");
-                }
+            // One Token rule
+            if (tokens.Count == 0)
+            {
+                throw new FormulaFormatException("Need to have at least 1 valid token");
+            }
 
-                
-                //Keep track of "(" and ")"
-                int open = 0;
-                int close = 0;
-                foreach (string token in tokens)
-                {
-                    if (token == ("(")) { open++; }
-                    if (token == (")")) { close++; }
-                }
-                //Right Parenthesis Rule
-                if (close > open) { throw new FormulaFormatException("There cannot be more closing parenthesis than open parnethesis"); }
-                //Balanced Parenthesis Rule
-                if (open != close) { throw new FormulaFormatException("mismatch parenthesis"); }
 
-                //Var to track of first and last token
-                string firstToken = tokens.First<string>();
-                string lastToken = tokens.Last<string>();
-                //Regex to recognize operator 
-                string operatorPattern = @"^[*/+\-]$";
-                //Starting Token Rule
-                if (Regex.IsMatch(firstToken, operatorPattern)) 
-                {
-                    throw new FormulaFormatException("Starting of the input need to be a number, a variable, or an opening parenthesis.");
-                }
-                //Ending Token Rule
-                if (Regex.IsMatch (lastToken, operatorPattern)) 
-                {
-                    throw new FormulaFormatException("Ending of the input need to be a number, a variable, or an opening parenthesis.");
-                }
+            //Keep track of "(" and ")"
+            int open = 0;
+            int close = 0;
+            foreach (string token in tokens)
+            {
+                if (token == ("(")) { open++; }
+                if (token == (")")) { close++; }
+            }
+            //Right Parenthesis Rule
+            if (close > open) { throw new FormulaFormatException("There cannot be more closing parenthesis than open parnethesis"); }
+            //Balanced Parenthesis Rule
+            if (open != close) { throw new FormulaFormatException("mismatch parenthesis"); }
 
-                //Regex to recognize "(, *, /, +, -"
-                string followRule = @"^[\(+*/\-]$";
-                //Regex to recognize a number, a variable, or a closing parenthesis 
-                string extraFollowRule = @"^[-+]?\d*\.?\d+([eE][-+]?\d+)?$|[a-zA-Z_][a-zA-Z0-9_]*|\)$";
-                //Regex to recognize a number, a variable, or an opening parenthesis.
-                string validTokenPattern = @"^[-+]?\d*\.?\d+([eE][-+]?\d+)?$|[a-zA-Z_][a-zA-Z0-9_]*|\($";
-                //Regex to recognize "(, *, /, +, -"
-                string extraValidTokenPattern = @"^[\)+*/\-]$";
-                for (int i = 0; i < tokens.Count - 1; i++)
+            //Var to track of first and last token
+            string firstToken = tokens.First<string>();
+            string lastToken = tokens.Last<string>();
+            //Regex to recognize operator 
+            string operatorPattern = @"^[*/+\-]$";
+            //Starting Token Rule
+            if (Regex.IsMatch(firstToken, operatorPattern))
+            {
+                throw new FormulaFormatException("Starting of the input need to be a number, a variable, or an opening parenthesis.");
+            }
+            //Ending Token Rule
+            if (Regex.IsMatch(lastToken, operatorPattern))
+            {
+                throw new FormulaFormatException("Ending of the input need to be a number, a variable, or an opening parenthesis.");
+            }
+
+            //Regex to recognize "(, *, /, +, -"
+            string followRule = @"^[\(+*/\-]$";
+            //Regex to recognize a number, a variable, or a closing parenthesis 
+            string extraFollowRule = @"^[-+]?\d*\.?\d+([eE][-+]?\d+)?$|[a-zA-Z_][a-zA-Z0-9_]*|\)$";
+            //Regex to recognize a number, a variable, or an opening parenthesis.
+            string validTokenPattern = @"^[-+]?\d*\.?\d+([eE][-+]?\d+)?$|[a-zA-Z_][a-zA-Z0-9_]*|\($";
+            //Regex to recognize "(, *, /, +, -"
+            string extraValidTokenPattern = @"^[\)+*/\-]$";
+            for (int i = 0; i < tokens.Count - 1; i++)
+            {
+                string currentToken = tokens[i];
+                string nextToken = tokens[i + 1];
+                //Parenthesis, operator following rule
+                if (Regex.IsMatch(currentToken, followRule))
                 {
-                    string currentToken = tokens[i];
-                    string nextToken = tokens[i + 1];
-                    //Parenthesis, operator following rule
-                    if (Regex.IsMatch(currentToken, followRule))
+                    if (!Regex.IsMatch(nextToken, validTokenPattern))
                     {
-                        if (!Regex.IsMatch(nextToken, validTokenPattern))
-                        {
-                            throw new FormulaFormatException("Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.");
-                        } 
-                    }
-                    //Extra following rule
-                    if (Regex.IsMatch(currentToken, extraFollowRule)) 
-                    {
-                        if (!Regex.IsMatch(nextToken, extraValidTokenPattern))
-                        {
-                            throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
-                        }
+                        throw new FormulaFormatException("Any token that immediately follows an opening parenthesis or an operator must be either a number, a variable, or an opening parenthesis.");
                     }
                 }
+                //Extra following rule
+                if (Regex.IsMatch(currentToken, extraFollowRule))
+                {
+                    if (!Regex.IsMatch(nextToken, extraValidTokenPattern))
+                    {
+                        throw new FormulaFormatException("Any token that immediately follows a number, a variable, or a closing parenthesis must be either an operator or a closing parenthesis.");
+                    }
+                }
+            }
 
             normVar = new List<string>();
             for (int i = 0; i < tokens.Count; i++)
             {
-                string v = tokens[i];
+                string var = tokens[i];
 
-                if (isVar(v))
+                if (isVar(var))
                 {
-                    string normalizedVar = normalize(v);
-
-                    if (!isVar(normalizedVar))
+                    string normalizedVar = normalize(var);
+                    /// If the formula contains a variable v such that normalize(v) is not a legal variable,
+                    /// throws a FormulaFormatException with an explanatory message.
+                    if (!(isVar(normalizedVar)))
                     {
-                        throw new FormulaFormatException("A normalized variable does not have a valid variable format");
+                        throw new FormulaFormatException("Not a valid variable format after normalized");
                     }
-
-                    if (!isValid(normalizedVar))
+                    /// If the formula contains a variable v such that isValid(normalize(v)) is false,
+                    /// throws a FormulaFormatException with an explanatory message.
+                    if (!(isValid(normalizedVar)))
                     {
-                        throw new FormulaFormatException("A normalized variable does not meet the isValid criteria for variables");
+                        throw new FormulaFormatException("Not a valid variable after normalized");
                     }
 
                     tokens[i] = normalizedVar;
@@ -194,150 +196,159 @@ namespace SpreadsheetUtilities
         }
 
 
-            /// <summary>
-            /// Evaluates this Formula, using the lookup delegate to determine the values of
-            /// variables. When a variable symbol v needs to be determined, it should be looked up
-            /// via lookup(normalize(v)). (Here, normalize is the normalizer that was passed to
-            /// the constructor.)
-            ///
-            /// For example, if L("x") is 2, L("X") is 4, and N is a method that converts all the letters
-            /// in a string to upper case:
-            ///
-            /// new Formula("x+7", N, s => true).Evaluate(L) is 11
-            /// new Formula("x+7").Evaluate(L) is 9
-            ///
-            /// Given a variable symbol as its parameter, lookup returns the variable's value
-            /// (if it has one) or throws an ArgumentException (otherwise).
-            ///
-            /// If no undefined variables or divisions by zero are encountered when evaluating
-            /// this Formula, the value is returned. Otherwise, a FormulaError is returned.
-            /// The Reason property of the FormulaError should have a meaningful explanation.
-            ///
-            /// This method should never throw an exception.
-            /// </summary>
-            public object Evaluate(Func<string, double> lookup)
+        /// <summary>
+        /// Evaluates this Formula, using the lookup delegate to determine the values of
+        /// variables. When a variable symbol v needs to be determined, it should be looked up
+        /// via lookup(normalize(v)). (Here, normalize is the normalizer that was passed to
+        /// the constructor.)
+        ///
+        /// For example, if L("x") is 2, L("X") is 4, and N is a method that converts all the letters
+        /// in a string to upper case:
+        ///
+        /// new Formula("x+7", N, s => true).Evaluate(L) is 11
+        /// new Formula("x+7").Evaluate(L) is 9
+        ///
+        /// Given a variable symbol as its parameter, lookup returns the variable's value
+        /// (if it has one) or throws an ArgumentException (otherwise).
+        ///
+        /// If no undefined variables or divisions by zero are encountered when evaluating
+        /// this Formula, the value is returned. Otherwise, a FormulaError is returned.
+        /// The Reason property of the FormulaError should have a meaningful explanation.
+        ///
+        /// This method should never throw an exception.
+        /// </summary>
+        public object Evaluate(Func<string, double> lookup)
         {
-                Stack <double> valstack = new();
-                Stack opstack = new();
-                string[] substrings = tokens.Cast<string>().ToArray<string>();
+            Stack<double> valstack = new();
+            Stack opstack = new();
+            string[] substrings = tokens.Cast<string>().ToArray<string>();
 
-                // Check each substring 
-                foreach (string substring in substrings)
+            // Check each substring 
+            foreach (string substring in substrings)
+            {
+                //if t is an integer
+                if (double.TryParse(substring, out double n))
                 {
-                    //if t is an integer
-                    if (double.TryParse(substring, out double n))
+                    //For mutiply and divine
+                    if (valstack.Count > 0 && opstack.Count > 0 && (opstack.Peek().ToString() == "*" || opstack.Peek().ToString() == "/"))
                     {
-                        //For mutiply and divine
-                        if (valstack.Count > 0 && opstack.Count > 0 && (opstack.Peek().ToString() == "*" || opstack.Peek().ToString() == "/"))
+                        double num1 = (double)valstack.Pop();
+                        double num2 = n;
+                        string op = (string)opstack.Pop();
+                        if (num2 == 0 && op == "/")
                         {
-                            double num1 = (double)valstack.Pop();
-                            double num2 = n;
-                            string op = (string)opstack.Pop();
-                            if (num2 == 0 && op == "/")
-                            {
-                                return new FormulaError("Cannot divine by zero");
-                            }
-                            valstack.Push(math(num1, op, num2));
+                            return new FormulaError("Cannot divine by zero");
                         }
-                        //push t onto value stack
-                        else { valstack.Push(n); }
+                        valstack.Push(math(num1, op, num2));
                     }
-                    //if t is a variable
-                    if (Regex.IsMatch(substring, @"^[a-zA-Z_][a-zA-Z0-9_]*$"))
+                    //push t onto value stack
+                    else { valstack.Push(n); }
+                }
+                //if t is a variable
+                if (Regex.IsMatch(substring, @"^[a-zA-Z_][a-zA-Z0-9_]*$"))
+                {
+                    double variableValue = 0;
+                    //Use try catch block to return FormulaError
+                    try
                     {
                         // Handle variables using the variableEvaluator delegate
-                        double variableValue = lookup(substring);
-                        //For mutiply and divine
-                        if (valstack.Count > 0 && opstack.Count > 0 && (opstack.Peek().ToString() == "*" || opstack.Peek().ToString() == "/"))
+                        variableValue = lookup(substring);
+                    }
+                    catch (ArgumentException error)
+                    {
+                        return new FormulaError("Variable is not definded");
+                    }
+                    //For mutiply and divine
+                    if (valstack.Count > 0 && opstack.Count > 0 && (opstack.Peek().ToString() == "*" || opstack.Peek().ToString() == "/"))
+                    {
+                        double num1 = (double)valstack.Pop();
+                        double num2 = variableValue;
+                        string op = (string)opstack.Pop();
+                        if (num2 == 0 && op == "/")
+                        {
+                            return new FormulaError("Cannot divine by zero");
+                        }
+                        valstack.Push(math(num1, op, num2));
+                    }
+                    //push t onto value stack
+                    else { valstack.Push(variableValue); }
+                }
+                //if t = "+" or "-"
+                if (substring == "+" || substring == "-")
+                {
+                    if (valstack.Count == 2 && opstack.Count > 0 && (opstack.Peek().Equals("+") || opstack.Peek().Equals("-")))
+                    {
+                        if (opstack.Peek().Equals("+"))
                         {
                             double num1 = (double)valstack.Pop();
-                            double num2 = variableValue;
+                            double num2 = (double)valstack.Pop();
                             string op = (string)opstack.Pop();
-                            if (num2 == 0 && op == "/")
-                            {
-                                return new FormulaError("Cannot divine by zero");
-                            }
                             valstack.Push(math(num1, op, num2));
                         }
-                        //push t onto value stack
-                        else { valstack.Push(variableValue); }
-                    }
-                    //if t = "+" or "-"
-                    if (substring == "+" || substring == "-")
-                    {
-                        if (valstack.Count == 2 && opstack.Count > 0 && (opstack.Peek().Equals("+") || opstack.Peek().Equals("-")))
+                        else if (opstack.Peek().Equals("-"))
                         {
-                            if (opstack.Peek().Equals("+"))
-                            {
-                                double num1 = (double)valstack.Pop();
-                                double num2 = (double)valstack.Pop();
-                                string op = (string)opstack.Pop();
-                                valstack.Push(math(num1, op, num2));
-                            }
-                            else if (opstack.Peek().Equals("-"))
-                            {
-                                double num1 = (double)valstack.Pop();
-                                double num2 = (double)valstack.Pop();
-                                string op = (string)opstack.Pop();
-                                valstack.Push(num2 - num1);
-                            }
-                        }
-                        opstack.Push(substring);
-                    }
-                    //if t = "*", "/", "("
-                    if (substring == "*" || substring == "/" || substring == "(")
-                    {
-                        opstack.Push(substring);
-                    }
-
-                    // if t = ")"
-                    if (substring == ")")
-                    {
-                     
-
-                        // Evaluate expressions inside parentheses
-                        while (opstack.Count > 0 && opstack.Peek().ToString() != "(")
-                        {
-                            double num1 = valstack.Pop();
-                            double num2 = valstack.Pop();
-                            string op = opstack.Pop().ToString();
-                            valstack.Push(math(num2, op, num1));
-                        }
-                      
-                            opstack.Pop();
-                        
-
-                        // Check if there are additional operators (* or /) after parentheses
-                        if (opstack.Count > 0 && (opstack.Peek().ToString().Trim() == "*" || opstack.Peek().ToString().Trim() == "/"))
-                        {
-                            double num1 = valstack.Pop();
-                            double num2 = valstack.Pop();
-                            string op = opstack.Pop().ToString();
-                            if (num1 == 0 && op == "/")
-                            {
-                                return new FormulaError("Cannot divine by zero");
-                            }
-                            valstack.Push(math(num2, op, num1));
+                            double num1 = (double)valstack.Pop();
+                            double num2 = (double)valstack.Pop();
+                            string op = (string)opstack.Pop();
+                            valstack.Push(num2 - num1);
                         }
                     }
-
+                    opstack.Push(substring);
                 }
-
-                // Process any remaining operators
-                while (opstack.Count > 0 && valstack.Count >= 2)
+                //if t = "*", "/", "("
+                if (substring == "*" || substring == "/" || substring == "(")
                 {
-                    double num1 = (double)valstack.Pop();
-                    double num2 = (double)valstack.Pop();
-                    string op = (string)opstack.Pop();
-                    if (num1 == 0 && op == "/")
-                    {
-                        return new FormulaError("Cannot divine by zero");
-                    }
-                    valstack.Push(math(num2, op, num1));
+                    opstack.Push(substring);
                 }
-                    double finalVal = (double)valstack.Pop();
-                    return finalVal;
+
+                // if t = ")"
+                if (substring == ")")
+                {
+
+
+                    // Evaluate expressions inside parentheses
+                    while (opstack.Count > 0 && opstack.Peek().ToString() != "(")
+                    {
+                        double num1 = valstack.Pop();
+                        double num2 = valstack.Pop();
+                        string op = opstack.Pop().ToString();
+                        valstack.Push(math(num2, op, num1));
+                    }
+
+                    opstack.Pop();
+
+
+                    // Check if there are additional operators (* or /) after parentheses
+                    if (opstack.Count > 0 && (opstack.Peek().ToString().Trim() == "*" || opstack.Peek().ToString().Trim() == "/"))
+                    {
+                        double num1 = valstack.Pop();
+                        double num2 = valstack.Pop();
+                        string op = opstack.Pop().ToString();
+                        if (num1 == 0 && op == "/")
+                        {
+                            return new FormulaError("Cannot divine by zero");
+                        }
+                        valstack.Push(math(num2, op, num1));
+                    }
+                }
+
             }
+
+            // Process any remaining operators
+            while (opstack.Count > 0 && valstack.Count >= 2)
+            {
+                double num1 = (double)valstack.Pop();
+                double num2 = (double)valstack.Pop();
+                string op = (string)opstack.Pop();
+                if (num1 == 0 && op == "/")
+                {
+                    return new FormulaError("Cannot divine by zero");
+                }
+                valstack.Push(math(num2, op, num1));
+            }
+            double finalVal = (double)valstack.Pop();
+            return finalVal;
+        }
         /// <summary>
         /// Method to do the math work depend on the operation
         /// </summary>
@@ -346,14 +357,14 @@ namespace SpreadsheetUtilities
         /// <param name="num2"></param>
         /// <returns></returns>
         private static double math(double num1, string op, double num2)
-            {
-                double value = 0;
-                if (op == "+") { value = num1 + num2; }
-                else if (op == "-") { value = num1 - num2; }
-                else if (op == "*") { value = num1 * num2; }
-                else if (op == "/") { value = num1 / num2; } 
-                return value;
-            }
+        {
+            double value = 0;
+            if (op == "+") { value = num1 + num2; }
+            else if (op == "-") { value = num1 - num2; }
+            else if (op == "*") { value = num1 * num2; }
+            else if (op == "/") { value = num1 / num2; }
+            return value;
+        }
 
         /// <summary>
         /// Enumerates the normalized versions of all of the variables that occur in this
@@ -386,9 +397,9 @@ namespace SpreadsheetUtilities
         public override string ToString()
         {
             StringBuilder strings = new StringBuilder();
-            foreach (string token in tokens) 
+            foreach (string token in tokens)
             {
-                if (token != " ") 
+                if (token != " ")
                 {
                     strings.Append(token);
                 }
@@ -418,16 +429,16 @@ namespace SpreadsheetUtilities
         /// new Formula("2.0 + x7").Equals(new Formula("2.000 + x7")) is true
         /// </summary>
         public override bool Equals(object? obj)
-            {
+        {
             //If obj is null or obj is not a Formula, returns false.
             if (obj == null || obj.GetType() != this.GetType())
-                {
+            {
                 return false;
-                }
-            
+            }
+
             //Set obj as formula type
             Formula formula = obj as Formula;
-            
+
             for (int i = 0; i < this.tokens.Count; i++)
             {
                 //Hold current token of each formula
@@ -442,7 +453,7 @@ namespace SpreadsheetUtilities
                 if ((Double.TryParse(formula1, out formNumber1)) && (Double.TryParse(formula2, out formNumber2)))
                 {
                     //Check if the 2 double are equal
-                    if (formNumber1 != formNumber2)  
+                    if (formNumber1 != formNumber2)
                         return false;
                 }
                 else
@@ -460,39 +471,39 @@ namespace SpreadsheetUtilities
         ///
         /// </summary>
         public static bool operator ==(Formula f1, Formula f2)
-            {
+        {
             if (f1 is null && f2 is null) { return true; }
             if (f1 is null || f2 is null) { return false; }
             //Use the notion of equality from the Equals method.
             return f1.Equals(f2);
-            }
+        }
         /// <summary>
         /// <change> We are now using Non-Nullable objects. Thus neither f1 nor f2 can be null!</change>
         /// <change> Note: != should almost always be not ==, if you get my meaning </change>
         /// Reports whether f1 != f2, using the notion of equality from the Equals method.
         /// </summary>
         public static bool operator !=(Formula f1, Formula f2)
-            {
-                if (!f1.Equals(f2)) return true;
-                return f1.Equals(f2); ;
-            }
+        {
+            if (!f1.Equals(f2)) return true;
+            return false;
+        }
         /// <summary>
         /// Returns a hash code for this Formula. If f1.Equals(f2), then it must be the
         /// case that f1.GetHashCode() == f2.GetHashCode(). Ideally, the probability that two
         /// randomly-generated unequal Formulae have the same hash code should be extremely small.
         /// </summary>
         public override int GetHashCode()
-            {
-                int getHash = this.ToString().GetHashCode();
-                return 0;
-            }
+        {
+            int getHash = this.ToString().GetHashCode();
+            return getHash;
+        }
         /// <summary>
         /// Given an expression, enumerates the tokens that compose it. Tokens are left paren;
         /// right paren; one of the four operator symbols; a string consisting of a letter or underscore
         /// followed by zero or more letters, digits, or underscores; a double literal; and anything that doesn't
         /// match one of those patterns. There are no empty tokens, and no token contains white space.
         /// </summary>
-    private static IEnumerable<string> GetTokens(String formula)
+        private static IEnumerable<string> GetTokens(String formula)
         {
             // Patterns for individual tokens
             String lpPattern = @"\(";
@@ -502,9 +513,9 @@ namespace SpreadsheetUtilities
             String doublePattern = @"(?: \d+\.\d* | \d*\.\d+ | \d+ ) (?: [eE][\+-]?\d+)?";
             String spacePattern = @"\s+";
             // Overall pattern
-            String pattern = String.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4}) |({5})",lpPattern, rpPattern, opPattern, varPattern,doublePattern, spacePattern);
+            String pattern = String.Format("({0}) | ({1}) | ({2}) | ({3}) | ({4}) |({5})", lpPattern, rpPattern, opPattern, varPattern, doublePattern, spacePattern);
             // Enumerate matching tokens that don't consist solely of white space.
-            foreach (String s in Regex.Split(formula, pattern,RegexOptions.IgnorePatternWhitespace))
+            foreach (String s in Regex.Split(formula, pattern, RegexOptions.IgnorePatternWhitespace))
             {
                 if (!Regex.IsMatch(s, @"^\s*$", RegexOptions.Singleline))
                 {
@@ -513,7 +524,7 @@ namespace SpreadsheetUtilities
             }
         }
     }
-  
+
     /// <summary>
     /// Used to report syntactic errors in the argument to the Formula constructor.
     /// </summary>
