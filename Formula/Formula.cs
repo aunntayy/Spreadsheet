@@ -27,6 +27,26 @@ using System.Diagnostics;
 namespace SpreadsheetUtilities
 {
     /// <summary>
+    /// Author:    Phuc Hoang
+    /// Partner:   -None-
+    /// Date:      3-Feb-2024
+    /// Course:    CS 3500, University of Utah, School of Computing
+    /// Copyright: CS 3500 and Phuc Hoang - This work may not 
+    ///            be copied for use in Academic Coursework.
+    ///
+    /// I, Phuc Hoang, certify that I wrote this code from scratch and
+    /// did not copy it in part or whole from another source.  All 
+    /// references used in the completion of the assignments are cited 
+    /// in my README file.
+    ///
+    /// File Contents
+    ///
+    ///    [This library is a refactored of FormualEvaluator class. Formula class is a more generalized version of FormulaEvaluator work. 
+    ///    This formula class will be utilized in the upcoming spreadsheet assignment.]
+    ///    
+    /// </summary>
+
+    /// <summary>
     /// Represents formulas written in standard infix notation using standard precedence
     /// rules. The allowed symbols are non-negative numbers written using double-precision
     /// floating-point syntax (without unary preceeding '-' or '+');

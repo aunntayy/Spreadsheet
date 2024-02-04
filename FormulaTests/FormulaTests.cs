@@ -5,6 +5,28 @@ using System.Text.RegularExpressions;
 
 namespace FormulaTests
 {
+    /// <summary>
+    /// Author:    Phuc Hoang
+    /// Partner:   -None-
+    /// Date:      3-Feb-2024
+    /// Course:    CS 3500, University of Utah, School of Computing
+    /// Copyright: CS 3500 and Phuc Hoang - This work may not 
+    ///            be copied for use in Academic Coursework.
+    ///
+    /// I, Phuc Hoang, certify that I wrote this code from scratch and
+    /// did not copy it in part or whole from another source.  All 
+    /// references used in the completion of the assignments are cited 
+    /// in my README file.
+    ///
+    /// File Contents
+    ///
+    ///    [This is a test for Formula]
+    ///    
+    /// </summary>
+
+    /// <summary>
+    ///This is a test class for Formula Test
+    ///</summary>
     [TestClass]
     public class FormulaTests
     {
