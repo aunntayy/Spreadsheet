@@ -432,7 +432,36 @@ namespace SpreadsheetUtilities
                 {
                 return false;
                 }
+            
+            //Set obj as formula type
+            Formula formula = obj as Formula;
+            
+            for (int i = 0; i < this.tokens.Count; i++)
+            {
+                //Hold current token of each formula
+                string formula1 = this.tokens[i];
+                string formula2 = formula.tokens[i];
+
+                //Hold number after parsing
+                double formNumber1;
+                double formNumber2;
+
+                //Convert string into double then check
+                if ((Double.TryParse(formula1, out formNumber1)) && (Double.TryParse(formula2, out formNumber2)))
+                {
+                    //Check if the 2 double are equal
+                    if (formNumber1 != formNumber2)  
+                        return false;
+                }
+                else
+                {
+                    //Check if the 2 string var are equal
+                    if (!(formula1.Equals(formula2)))
+                        return false;
+                }
             }
+            return true;
+        }
         /// <summary>
         /// <change> We are now using Non-Nullable objects. Thus neither f1 nor f2 can be null!</change>
         /// Reports whether f1 == f2, using the notion of equality from the Equals method.
@@ -440,7 +469,10 @@ namespace SpreadsheetUtilities
         /// </summary>
         public static bool operator ==(Formula f1, Formula f2)
             {
-                return false;
+            if (f1 is null && f2 is null) { return true; }
+            if (f1 is null || f2 is null) { return false; }
+            //Use the notion of equality from the Equals method.
+            return f1.Equals(f2);
             }
         /// <summary>
         /// <change> We are now using Non-Nullable objects. Thus neither f1 nor f2 can be null!</change>
@@ -449,7 +481,8 @@ namespace SpreadsheetUtilities
         /// </summary>
         public static bool operator !=(Formula f1, Formula f2)
             {
-                return false;
+                if (!f1.Equals(f2)) return true;
+                return f1.Equals(f2); ;
             }
         /// <summary>
         /// Returns a hash code for this Formula. If f1.Equals(f2), then it must be the
@@ -458,6 +491,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override int GetHashCode()
             {
+                int getHash = this.ToString().GetHashCode();
                 return 0;
             }
         /// <summary>

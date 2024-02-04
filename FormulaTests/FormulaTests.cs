@@ -6,6 +6,7 @@ namespace FormulaTests
     [TestClass]
     public class FormulaTests
     {
+        //Parsing Rule Test
         [TestMethod]
         [ExpectedException(typeof(FormulaFormatException))]
         public void OneTokenTest()
@@ -55,6 +56,23 @@ namespace FormulaTests
         {
             Formula f = new Formula("(3+1");
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void ComplexBalanceParenthesisTest()
+        {
+            Formula f = new Formula("(1+2)-(3+1))");
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(FormulaFormatException))]
+        public void SimpleTokenRuleTest()
+        {
+            Formula f = new Formula("2+@");
+        }
+        //End of parsing Rule test
+
+        // Divine by zero test
         [TestMethod]
         public void SimpleDivineByZeroTest()
         {
@@ -75,21 +93,23 @@ namespace FormulaTests
             Formula f = new Formula("(1 + X1) / (X1 - 12)");
             Assert.IsInstanceOfType(f.Evaluate(s => 12), typeof(FormulaError));
         }
+        //End of divine by zero test
 
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void ComplexBalanceParenthesisTest()
+        //Evaluate test
+
+        public void simpleMathTest()
         {
-            Formula f = new Formula("(1+2)-(3+1))");
+            Formula f1 = new Formula("1+2");
+            Formula f2 = new Formula("2-2");
+            Formula f3 = new Formula("2/2");
+            Formula f4 = new Formula("2*2");
+            Assert.AreEqual(3, f1.Evaluate(s => 0));
+            Assert.AreEqual(0, f2.Evaluate(s => 0));
+            Assert.AreEqual(1, f3.Evaluate(s => 0));
+            Assert.AreEqual(4, f4.Evaluate(s => 0));
         }
 
-        [TestMethod]
-        [ExpectedException(typeof(FormulaFormatException))]
-        public void SimpleTokenRuleTest()
-        {
-            Formula f = new Formula("2+@");
-        }
-
+        //End of Evaluate test
         [TestMethod]
         public void SimpleGetVariableTest() 
         {
@@ -116,7 +136,7 @@ namespace FormulaTests
         }
 
         [TestMethod()]
-        public void Test3()
+        public void GetVaribleWithNomarlizerTest()
         {
             Formula f = new Formula("B1 + a1", x => x.ToUpper(), x => true);
             IEnumerable<string> variables = f.GetVariables();
@@ -125,6 +145,33 @@ namespace FormulaTests
             Assert.AreEqual("B1+A1", formula);
         }
 
+        [TestMethod]
+        public void EqualTest1()
+        {
+            Formula f1 = new Formula("X1+X2");
+            Formula f2 = new Formula("X2+X2");
+            Assert.IsFalse(f1.Equals(f2));
+        }
 
+        [TestMethod]
+        public void EqualTest2()
+        {
+            Formula f1 = new Formula("1.0000000000000000+X2");
+            Formula f2 = new Formula("1+X2");
+            Assert.IsTrue(f1.Equals(f2));
+        }
+        [TestMethod]
+        public void testBoolFormula()
+        {
+            Formula f1 = new Formula("2*x3", s => s.ToUpper(), s => true);
+            Formula f2 = new Formula("2*x3", s => s.ToUpper(), s => true);
+            bool areEqual = f1 == f2;
+            Assert.IsTrue(areEqual);
+
+            f1 = new Formula("2*x6", s => s.ToUpper(), s => true);
+            f2 = new Formula("2*x4", s => s.ToUpper(), s => true);
+            bool areNotEqual = f1 != f2;
+            Assert.IsTrue(areNotEqual);
+        }
     }
 }
