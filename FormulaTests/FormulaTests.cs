@@ -63,7 +63,7 @@ namespace FormulaTests
         [ExpectedException(typeof(FormulaFormatException))]
         public void validVarTest()
         {
-            Formula f = new Formula("12b");
+            Formula f = new Formula("1b");
         }
 
         [TestMethod]
