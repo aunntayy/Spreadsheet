@@ -79,12 +79,11 @@ namespace DevelopmentTests
             t.AddDependency("x", "y");
             Assert.AreEqual(t.Size, 1);
             t.RemoveDependency("x", "y");
-            t.ReplaceDependents("x", new HashSet<string>());
-            t.ReplaceDependees("y", new HashSet<string>() { "e" });
             Assert.AreEqual(t.Size, 0);
-            t.ReplaceDependents("", new HashSet<string>());
-            t.ReplaceDependees("e", new HashSet<string>() { "x" });
-            Assert.AreEqual(t.Size, 0);
+            t.AddDependency("x", "y");
+            t.ReplaceDependents("x", new HashSet<string>() { "y"});
+            t.ReplaceDependees("y", new HashSet<string>() { "x" });
+            Assert.AreEqual(t.Size, 1);
         }
         ///<summary>
         ///It should be possibe to have more than one DG at a time.
@@ -311,11 +310,11 @@ namespace DevelopmentTests
             t.ReplaceDependees("a",new HashSet<string>());
             t.ReplaceDependents("b", new HashSet<string>());
             Assert.IsTrue(t.HasDependees("h"));
-            Assert.IsTrue(t.HasDependents("b"));
+            Assert.IsFalse(t.HasDependents("b"));
             Assert.IsFalse(t.HasDependents("f"));
             Assert.IsTrue(t.HasDependents("c"));
             Assert.IsTrue(t.HasDependents("a"));
-            Assert.IsTrue(t.HasDependees("a"));
+            Assert.IsFalse(t.HasDependees("a"));
         }
     }
 }

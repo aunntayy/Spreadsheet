@@ -29,7 +29,7 @@ namespace SpreadsheetUtilities
     ///    It will help with deciding which value will be compute first]
     ///    
     /// </summary>
- 
+
     /// <summary>
     /// (s1,t1) is an ordered pair of strings
     /// t1 depends on s1; s1 must be evaluated before t1
@@ -62,6 +62,7 @@ namespace SpreadsheetUtilities
         //Declare 2 private dictionary with key string and value HashSet<string>
         private Dictionary<string, HashSet<string>> dependents;
         private Dictionary<string, HashSet<string>> dependees;
+        private int size;
         /// <summary>
         /// Creates an empty DependencyGraph.
         /// </summary>
@@ -69,8 +70,9 @@ namespace SpreadsheetUtilities
         {
             //Declare var
             dependents = new Dictionary<string, HashSet<string>>();
-            dependees = new Dictionary<string, HashSet<string>>();  
-    }
+            dependees = new Dictionary<string, HashSet<string>>();
+            size = 0;
+        }
         /// <summary>
         /// The number of ordered pairs in the DependencyGraph.
         /// </summary>
@@ -78,10 +80,8 @@ namespace SpreadsheetUtilities
         {
             get
             {
-                int size = 0;
                 //Count the number of pair of dependent
                 //since it is a mirror structure so they should have the same size 
-                foreach (var pair in dependents) { size += pair.Value.Count; }
                 return size;
             }
         }
@@ -126,7 +126,7 @@ namespace SpreadsheetUtilities
             //Check if dependee contain key
             if (dependees.ContainsKey(s))
             {
-                 return dependees[s];
+                return dependees[s];
             }
             else { return Enumerable.Empty<string>(); }
         }
@@ -140,7 +140,7 @@ namespace SpreadsheetUtilities
             {
                 return dependents[s];
             }
-            else { return Enumerable.Empty<string>(); }    
+            else { return Enumerable.Empty<string>(); }
         }
         /// <summary>
         /// <para>Adds the ordered pair (s,t), if it doesn't exist</para>
@@ -154,6 +154,10 @@ namespace SpreadsheetUtilities
         /// <param name="t"> t cannot be evaluated until s is</param> ///
         public void AddDependency(string s, string t)
         {
+            if (!(dependents.ContainsKey(t) && dependees.ContainsKey(s)))
+            {
+                size++;
+            }
             //check for empty node in dependents
             if (!dependents.ContainsKey(t))
             {
@@ -178,7 +182,11 @@ namespace SpreadsheetUtilities
         /// <param name="t"></param>
         public void RemoveDependency(string s, string t)
         {
-            //check if they exist
+            if (dependents.ContainsKey(t) && dependees.ContainsKey(s)) 
+            {
+                size--;
+            }
+                //check if they exist
             if (dependents.ContainsKey(t) && dependees.ContainsKey(s))
             {
                 //remove the value
@@ -197,28 +205,19 @@ namespace SpreadsheetUtilities
         public void ReplaceDependents(string s, IEnumerable<string> newDependents)
         {
             //check to see if s exist in dictionary dependents
-            if (dependees.ContainsKey(s)) 
-            { 
-                foreach (var existDependees in dependees[s].ToList()) 
-                {
-                    //In case the value is ""
-                    if (newDependents.Count() == 0)
-                    {
-                        //remove the exist dependee then add ""
-                        RemoveDependency(existDependees, s);
-                        AddDependency(s, "");
-                    }
-                    foreach (var newDependees in newDependents)
-                    {
-                        {
-                            //remove the exist dependee then add the new one
-                            RemoveDependency(s, existDependees);
-                            AddDependency(s, newDependees);
-                        }
-                    }
-                }
+            IEnumerable<string> existDependees = GetDependents(s);
+            foreach (string existDependee in existDependees)
+            {
+                RemoveDependency(s, existDependee);
             }
-            
+            foreach (string newDependees in newDependents)
+            { 
+                //remove the exist dependee then add the new one
+                AddDependency(s, newDependees);
+
+            }
+
+
         }
         /// <summary>
         /// Removes all existing ordered pairs of the form (r,s). Then, for each
@@ -226,30 +225,19 @@ namespace SpreadsheetUtilities
         /// </summary>
         public void ReplaceDependees(string s, IEnumerable<string> newDependees)
         {
-            //check to see if s exist in dictionary dependees
-            if (dependents.ContainsKey(s)) 
+            IEnumerable<string> existDependents = GetDependees(s);
+            //remove all s from dependees
+            foreach (string existDependent in existDependents)
             {
-                //remove all s from dependees
-                foreach (var existDependents in dependents[s].ToList())
-                {
-                    {
-                        //In case the value is ""
-                        if (newDependees.Count() == 0)
-                        {
-                            //remove the exist dependent then add ""
-                            RemoveDependency(existDependents, s);
-                            AddDependency("", s);
-                        }
-                        foreach (var newDependents in newDependees)
-                        {
-                            //remove the exist dependent then add the new one
-                            RemoveDependency(existDependents, s);
-                            AddDependency(newDependents, s);
-                        }
-                    }
-                }
-                
+                RemoveDependency(existDependent, s);
             }
+
+            foreach (string newDependents in newDependees)
+            {
+                //remove the exist dependent then add the new one
+                AddDependency(newDependents, s);
+            }
+
         }
     }
 }
