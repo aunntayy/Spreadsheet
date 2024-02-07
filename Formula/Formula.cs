@@ -399,7 +399,7 @@ namespace SpreadsheetUtilities
         /// </summary>
         public IEnumerable<String> GetVariables()
         {
-            List<string> variables = normVar.Where(token => isVar(token)).ToList();
+            List<string> variables = normVar.Where(token => isVar(token)).Distinct().ToList();
             return variables;
         }
 
@@ -419,7 +419,13 @@ namespace SpreadsheetUtilities
             StringBuilder strings = new StringBuilder();
             foreach (string token in tokens)
             {
-                if (token != " ")
+                // Parse the token as a double
+                if (double.TryParse(token, out double parsedDouble))
+                {
+                    // Convert the double to an int and append it
+                    strings.Append(((int)parsedDouble).ToString());
+                }
+                else
                 {
                     strings.Append(token);
                 }
@@ -514,8 +520,9 @@ namespace SpreadsheetUtilities
         /// </summary>
         public override int GetHashCode()
         {
-            int getHash = this.ToString().GetHashCode();
-            return getHash;
+             
+             int getHash = this.ToString().GetHashCode();
+             return getHash;
         }
         /// <summary>
         /// Given an expression, enumerates the tokens that compose it. Tokens are left paren;
