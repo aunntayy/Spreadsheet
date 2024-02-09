@@ -34,7 +34,7 @@ namespace SS
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
             //return all the key that have value
-            return cells.Keys.ToArray();
+            return cells.Keys.ToList();
         }
 
         public override object GetCellContents(string name)
@@ -60,12 +60,15 @@ namespace SS
             // Access the cell
             if (cells.TryGetValue(name, out cell))
             {
+                // Update the cell
                 cell = new Cell(number);
                 cells[name] = cell;
 
                 // Get cells that need to be recalculated
                 HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
 
+                // Returns an enumeration, without duplicates, of the names of all cells that contain
+                // formulas containing name.
                 return dependentCells;
             }
             else
@@ -96,12 +99,15 @@ namespace SS
             //Acces the cell
             if (cells.TryGetValue(name, out cell))
             {
+                // Update the cell
                 cell = new Cell(text);
                 cells[name] = cell;
 
-                // Get cells that need to be recalculated
+                //Get cells that need to be recalculated
                 HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
 
+                // Returns an enumeration, without duplicates, of the names of all cells that contain
+                // formulas containing name.
                 return dependentCells;
             }
             else
@@ -118,7 +124,41 @@ namespace SS
 
         public override ISet<string> SetCellContents(string name, Formula formula)
         {
-            throw new NotImplementedException();
+            //If name is null and invalid then throw exception
+            if (name is null)
+            {
+                throw new ArgumentException();
+            }
+            if (!isValid(name))
+            {
+                throw new InvalidNameException();
+            }
+
+            Cell cell;
+            //Acces the cell
+            if (cells.TryGetValue(name, out cell))
+            {
+                //Update the cell
+                cell = new Cell(formula);
+                cells[name] = cell;
+
+                // Get cells that need to be recalculated
+                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
+
+                // Returns an enumeration, without duplicates, of the names of all cells that contain
+                // formulas containing name.
+                return dependentCells;
+            }
+            else
+
+            {
+                // Create new cell with the provided number content
+                cell = new Cell(formula);
+                cells[name] = cell;
+
+                // Return empty set of dependents for new cells
+                return new HashSet<string>();
+            }
         }
 
         protected override IEnumerable<string> GetDirectDependents(string name)
