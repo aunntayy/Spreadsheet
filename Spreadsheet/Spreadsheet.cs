@@ -42,7 +42,8 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
-            return 1;
+            //Get the contents
+            return cells[name].Content;
         }
 
         public override ISet<string> SetCellContents(string name, double number)
@@ -67,11 +68,7 @@ namespace SS
 
         protected override IEnumerable<string> GetDirectDependents(string name)
         {
-            //If name is null then throw exception
-            if (name is null)
-            {
-                throw new InvalidNameException();
-            }
+            //Get the dependents by calling the GetDependents
             return dg.GetDependents(name);
         }
 
@@ -81,31 +78,27 @@ namespace SS
             return Regex.IsMatch(name, @"^[a-zA-Z_][a-zA-Z0-9_]*$");
         }
 
-        //Cell type set up
+        //Cell class set up
         private class Cell
         {
-            public object content { get; private set; }
-            public object value {  get; private set; }
-            //empty by default
-            public Cell()
-            {
-                content = "";
-                value = "";
-            }
+            public object Content { get; private set; }
+            public object Value {  get; private set; }
+            
             public Cell(string name)
             {
-                content = name;
-                value = name;
+                Content = name;
+                Value = name;
             }
             public Cell(double number)
             {
-                content = number;
-                value = number;
+                Content = number;
+                Value = number;
             }
             public Cell(Formula formula)
             {
-               content = formula.ToString();
-               value = formula.Evaluate();
+               //If it was a formula maybe it was valid already ???
+               Content = formula;
+               Value = formula;
             }
         }
     }
