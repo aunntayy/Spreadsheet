@@ -6,6 +6,8 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SS
 {   
@@ -32,7 +34,7 @@ namespace SS
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
             //return all the key that have value
-            return cells.Keys;
+            return cells.Keys.ToArray();
         }
 
         public override object GetCellContents(string name)
@@ -48,17 +50,70 @@ namespace SS
 
         public override ISet<string> SetCellContents(string name, double number)
         {
-            //If name is null and invalid then throw exception
+            // If name is null or invalid, throw an exception
             if (name is null || !isValid(name))
             {
                 throw new InvalidNameException();
             }
-            throw new InvalidNameException();
+
+            Cell cell;
+            // Access the cell
+            if (cells.TryGetValue(name, out cell))
+            {
+                cell = new Cell(number);
+                cells[name] = cell;
+
+                // Get cells that need to be recalculated
+                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
+
+                return dependentCells;
+            }
+            else
+            {
+                // Create new cell with the provided number content
+                cell = new Cell(number);
+                cells[name] = cell;
+
+                // Return empty set of dependents for new cells
+                return new HashSet<string>();
+            }
         }
+
 
         public override ISet<string> SetCellContents(string name, string text)
         {
-            throw new NotImplementedException();
+            //If name is null and invalid then throw exception
+            if (name is null)
+            {
+                throw new ArgumentException();
+            }
+            if (!isValid(name))
+            {
+                throw new InvalidNameException();
+            }
+
+            Cell cell;
+            //Acces the cell
+            if (cells.TryGetValue(name, out cell))
+            {
+                cell = new Cell(text);
+                cells[name] = cell;
+
+                // Get cells that need to be recalculated
+                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
+
+                return dependentCells;
+            }
+            else
+       
+            {
+                // Create new cell with the provided number content
+                cell = new Cell(text);
+                cells[name] = cell;
+
+                // Return empty set of dependents for new cells
+                return new HashSet<string>();
+            }
         }
 
         public override ISet<string> SetCellContents(string name, Formula formula)
