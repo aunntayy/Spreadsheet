@@ -10,7 +10,7 @@ using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SS
-{   
+{
     /// <summary>
     /// 
     /// </summary>
@@ -22,10 +22,10 @@ namespace SS
         /// <summary>
         /// Constructor set up for zero-argument constructor that creates an empty spreadsheet.
         /// </summary>
-        public Spreadsheet ()
+        public Spreadsheet()
         {
-            cells = new Dictionary<string, Cell> ();
-            dg = new DependencyGraph ();
+            cells = new Dictionary<string, Cell>();
+            dg = new DependencyGraph();
         }
         /// <summary>
         /// Get the name of all non empty cell
@@ -40,7 +40,7 @@ namespace SS
         public override object GetCellContents(string name)
         {
             //If name is null and invalid then throw exception
-            if (name is null || !isValid(name)) 
+            if (name is null || !isValid(name))
             {
                 throw new InvalidNameException();
             }
@@ -57,29 +57,20 @@ namespace SS
             }
 
             Cell cell;
-            // Access the cell
-            if (cells.TryGetValue(name, out cell))
-            {
-                // Update the cell
-                cell = new Cell(number);
-                cells[name] = cell;
 
-                // Get cells that need to be recalculated
-                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
+            // Update the cell
+            cell = new Cell(number);
+            cells[name] = cell;
 
-                // Returns an enumeration, without duplicates, of the names of all cells that contain
-                // formulas containing name.
-                return dependentCells;
-            }
-            else
-            {
-                // Create new cell with the provided number content
-                cell = new Cell(number);
-                cells[name] = cell;
+            // Get cells that need to be recalculated
+            HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
+                {
+                    name
+                };
+            // Returns an enumeration, without duplicates, of the names of all cells that contain
+            // formulas containing name.
+            return dependentCells;
 
-                // Return empty set of dependents for new cells
-                return new HashSet<string>();
-            }
         }
 
 
@@ -96,30 +87,20 @@ namespace SS
             }
 
             Cell cell;
-            //Acces the cell
-            if (cells.TryGetValue(name, out cell))
-            {
-                // Update the cell
-                cell = new Cell(text);
-                cells[name] = cell;
 
-                //Get cells that need to be recalculated
-                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
+            // Update the cell
+            cell = new Cell(text);
+            cells[name] = cell;
 
-                // Returns an enumeration, without duplicates, of the names of all cells that contain
-                // formulas containing name.
-                return dependentCells;
-            }
-            else
-       
-            {
-                // Create new cell with the provided number content
-                cell = new Cell(text);
-                cells[name] = cell;
+            //Get cells that need to be recalculated
+            HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
+                {
+                    name
+                };
+            // Returns an enumeration, without duplicates, of the names of all cells that contain
+            // formulas containing name.
+            return dependentCells;
 
-                // Return empty set of dependents for new cells
-                return new HashSet<string>();
-            }
         }
 
         public override ISet<string> SetCellContents(string name, Formula formula)
@@ -135,30 +116,22 @@ namespace SS
             }
 
             Cell cell;
-            //Acces the cell
-            if (cells.TryGetValue(name, out cell))
+
+            //Update the cell
+            cell = new Cell(formula);
+            cells[name] = cell;
+            foreach (var Var in formula.GetVariables())
             {
-                //Update the cell
-                cell = new Cell(formula);
-                cells[name] = cell;
-
-                // Get cells that need to be recalculated
-                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
-
-                // Returns an enumeration, without duplicates, of the names of all cells that contain
-                // formulas containing name.
-                return dependentCells;
+                dg.AddDependency(Var, name);
             }
-            else
-
-            {
-                // Create new cell with the provided number content
-                cell = new Cell(formula);
-                cells[name] = cell;
-                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
-                // Return empty set of dependents for new cells
-                return dependentCells;
-            }
+            // Get cells that need to be recalculated
+            HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
+                {
+                    name
+                };
+            // Returns an enumeration, without duplicates, of the names of all cells that contain
+            // formulas containing name.
+            return dependentCells;
         }
 
         protected override IEnumerable<string> GetDirectDependents(string name)
@@ -177,8 +150,8 @@ namespace SS
         private class Cell
         {
             public object Content { get; private set; }
-            public object Value {  get; private set; }
-            
+            public object Value { get; private set; }
+
             public Cell(string name)
             {
                 Content = name;
@@ -191,9 +164,9 @@ namespace SS
             }
             public Cell(Formula formula)
             {
-               //If it was a formula maybe it was valid already ???
-               Content = formula;
-               Value = formula;
+                //If it was a formula maybe it was valid already ???
+                Content = formula;
+                Value = formula;
             }
         }
     }

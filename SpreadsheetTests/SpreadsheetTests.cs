@@ -122,7 +122,7 @@ namespace SpreadsheetTests
         {
             Spreadsheet sheet = new Spreadsheet();
             //Create a new cell and set it
-            sheet.SetCellContents("A1", new Formula("A2+1"));
+            var cell = sheet.SetCellContents("A1", new Formula("A2+1"));
             Assert.AreEqual("A2+1", sheet.GetCellContents("A1").ToString());
             //Update Cell formula type with new content
             sheet.SetCellContents("A1", new Formula("A3+3"));
@@ -143,11 +143,11 @@ namespace SpreadsheetTests
 
         [TestMethod]
         [ExpectedException(typeof(CircularException))]
-        public void setNameOfAllNullCellTest()
+        public void DDDD()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("A1", new Formula("A2"));
-            sheet.SetCellContents("A2", new Formula("A1"));
+            sheet.SetCellContents("B1", new Formula("A1"));
+            sheet.SetCellContents("A1", new Formula("B1"));
         }
         ///<paragraph>
         ///End of the Functionality test
