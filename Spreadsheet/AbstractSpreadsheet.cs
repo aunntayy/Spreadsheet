@@ -298,21 +298,25 @@ namespace SS
         ///
         /// -- You should fully comment what is going on below using XML tags as appropriate --
         /// </summary>
-        private void Visit(String start, String name, ISet<String> visited,
-        LinkedList<String> changed)
+        private void Visit(String start, String name, ISet<String> visited, LinkedList<String> changed)
         {
+            //add name of the cell
             visited.Add(name);
+            //check each dependent of name
             foreach (String n in GetDirectDependents(name))
             {
+                //if a cell is the same with the start point then throw
                 if (n.Equals(start))
                 {
                     throw new CircularException();
                 }
+                //Recursive to keep visting and check
                 else if (!visited.Contains(n))
                 {
                     Visit(start, n, visited, changed);
                 }
             }
+            //Add the cell that changed 
             changed.AddFirst(name);
         }
     }

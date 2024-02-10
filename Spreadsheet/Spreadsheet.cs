@@ -34,7 +34,7 @@ namespace SS
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
             //return all the key that have value
-            return cells.Keys.ToList();
+            return cells.Keys;
         }
 
         public override object GetCellContents(string name)
@@ -155,9 +155,9 @@ namespace SS
                 // Create new cell with the provided number content
                 cell = new Cell(formula);
                 cells[name] = cell;
-
+                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
                 // Return empty set of dependents for new cells
-                return new HashSet<string>();
+                return dependentCells;
             }
         }
 

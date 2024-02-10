@@ -15,7 +15,7 @@ namespace SpreadsheetTests
         ///Start of exception test
         ///</paragraph>
         
-        //Test for get cell content method
+        //Test for get cell content metho
         [TestMethod]
         [ExpectedException(typeof(InvalidNameException))]
         public void getInvalidCellName()
@@ -97,21 +97,36 @@ namespace SpreadsheetTests
         public void setCellNumber()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("A1", 42.0);
-            sheet.SetCellContents("A2", "hello");
+            //Create a new cell and set it
             sheet.SetCellContents("A1", 43.0);
-            Assert.AreEqual("hello", sheet.GetCellContents("A2"));
             Assert.AreEqual(43.0, sheet.GetCellContents("A1"));
+            //Update Cell number type with new content
+            sheet.SetCellContents("A1", 69.0);
+            Assert.AreEqual(69.0, sheet.GetCellContents("A1"));
+        }
+
+        [TestMethod]
+        public void setCellText()
+        {
+            Spreadsheet sheet = new Spreadsheet();
+            //Create a new cell and set it
+            sheet.SetCellContents("A1", "Hello");
+            Assert.AreEqual("Hello", sheet.GetCellContents("A1"));
+            //Update Cell text type with new content
+            sheet.SetCellContents("A1", "Konichiwa");
+            Assert.AreEqual("Konichiwa", sheet.GetCellContents("A1"));
         }
 
         [TestMethod]
         public void setCelNumberFormula()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("A1", new Formula("A2"));
-            sheet.SetCellContents("A2", new Formula("A3+3"));
-            sheet.SetCellContents("A3", new Formula("2+3+A4"));
-            Assert.AreEqual("A3+3", sheet.GetCellContents("A2").ToString());
+            //Create a new cell and set it
+            sheet.SetCellContents("A1", new Formula("A2+1"));
+            Assert.AreEqual("A2+1", sheet.GetCellContents("A1").ToString());
+            //Update Cell formula type with new content
+            sheet.SetCellContents("A1", new Formula("A3+3"));
+            Assert.AreEqual("A3+3", sheet.GetCellContents("A1").ToString());
         }
 
         [TestMethod]
@@ -124,6 +139,15 @@ namespace SpreadsheetTests
             var cell = sheet.GetNamesOfAllNonemptyCells();
             Assert.IsTrue(cell.Contains("A1"));
             Assert.IsTrue(cell.Contains("A2"));
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CircularException))]
+        public void setNameOfAllNullCellTest()
+        {
+            Spreadsheet sheet = new Spreadsheet();
+            sheet.SetCellContents("A1", new Formula("A2"));
+            sheet.SetCellContents("A2", new Formula("A1"));
         }
         ///<paragraph>
         ///End of the Functionality test
