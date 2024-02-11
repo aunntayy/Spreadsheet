@@ -4,6 +4,25 @@ using SS;
 
 namespace SpreadsheetTests
 {
+    /// <summary>
+    /// Author:    Phuc Hoang
+    /// Partner:   -None-
+    /// Date:      10-Feb-2024
+    /// Course:    CS 3500, University of Utah, School of Computing
+    /// Copyright: CS 3500 and Phuc Hoang - This work may not 
+    ///            be copied for use in Academic Coursework.
+    ///
+    /// I, Phuc Hoang, certify that I wrote this code from scratch and
+    /// did not copy it in part or whole from another source.  All 
+    /// references used in the completion of the assignments are cited 
+    /// in my README file.
+    ///
+    /// File Contents
+    ///
+    ///    [This file contains the test for Spreedsheet Class]
+    ///    
+    /// </summary>
+    
     [TestClass]
     public class SpreadsheetTests
     {
@@ -82,6 +101,31 @@ namespace SpreadsheetTests
             Spreadsheet sheet = new Spreadsheet();
             sheet.SetCellContents(null, new Formula("A2+2"));
         }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void setTextContentNull()
+        {
+            Spreadsheet sheet = new Spreadsheet();
+            sheet.SetCellContents("B1", (string)null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(ArgumentNullException))]
+        public void setFormulaContentNull()
+        {
+            Spreadsheet sheet = new Spreadsheet();
+            sheet.SetCellContents("B1", (Formula)null);
+        }
+
+        [TestMethod]
+        [ExpectedException(typeof(CircularException))]
+        public void circularDependency()
+        {
+            Spreadsheet sheet = new Spreadsheet();
+            sheet.SetCellContents("B1", new Formula("A1"));
+            sheet.SetCellContents("A1", new Formula("B1"));
+        }
         ///<paragraph>
         ///End of exception test
         ///</paragraph>
@@ -142,15 +186,14 @@ namespace SpreadsheetTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(CircularException))]
-        public void DDDD()
+        public void getContentOfEmptyCell()
         {
-            Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("B1", new Formula("A1"));
-            sheet.SetCellContents("A1", new Formula("B1"));
+            Spreadsheet spreadsheet = new Spreadsheet();
+            Assert.AreEqual("", spreadsheet.GetCellContents("A1"));
         }
         ///<paragraph>
         ///End of the Functionality test
         ///</paragraph>
+
     }
 }

@@ -12,11 +12,34 @@ using static System.Runtime.InteropServices.JavaScript.JSType;
 namespace SS
 {
     /// <summary>
-    /// 
+    /// Author:    Phuc Hoang
+    /// Partner:   -None-
+    /// Date:      10-Feb-2024
+    /// Course:    CS 3500, University of Utah, School of Computing
+    /// Copyright: CS 3500 and Phuc Hoang - This work may not 
+    ///            be copied for use in Academic Coursework.
+    ///
+    /// I, Phuc Hoang, certify that I wrote this code from scratch and
+    /// did not copy it in part or whole from another source.  All 
+    /// references used in the completion of the assignments are cited 
+    /// in my README file.
+    ///
+    /// File Contents
+    ///
+    ///    [This file contains the implementation of a spreadsheet application 
+    ///    for CS 3500 course. It includes classes and methods related to managing
+    ///    and manipulating spreadsheet data.]
+    ///    
+    /// </summary>
+
+    /// <summary>
+    /// Represents a spreadsheet application capable of storing and manipulating data.
     /// </summary>
     public class Spreadsheet : AbstractSpreadsheet
     {
+        // Dictionary to store cells in the spreadsheet
         Dictionary<string, Cell> cells;
+        // Dependency graph to track dependencies between cells
         DependencyGraph dg;
 
         /// <summary>
@@ -24,19 +47,26 @@ namespace SS
         /// </summary>
         public Spreadsheet()
         {
+            // Initialize
             cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
         }
         /// <summary>
         /// Get the name of all non empty cell
         /// </summary>
-        /// <returns> the cell name </returns>
+        /// <returns> All the cell name </returns>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
             //return all the key that have value
             return cells.Keys;
         }
 
+        /// <summary>
+        /// Get the cell content with using the cell name
+        /// </summary>
+        /// <param name="name"></param>
+        /// <returns>The content of the named cell</returns>
+        /// <exception cref="InvalidNameException"></exception>
         public override object GetCellContents(string name)
         {
             //If name is null and invalid then throw exception
@@ -44,10 +74,18 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
+            //Make sure every cell return an empty string
+            if (!cells.ContainsKey(name)) { return ""; }
             //Get the contents
             return cells[name].Content;
         }
-
+        /// <summary>
+        /// Set the content of the named cell with a double number
+        /// </summary>
+        /// <param name="name">Cell name</param>
+        /// <param name="number">Double type input</param>
+        /// <returns>an enumeration, without duplicates, of the names of all cells that contain formulas containing name.</returns>
+        /// <exception cref="InvalidNameException"></exception>
         public override ISet<string> SetCellContents(string name, double number)
         {
             // If name is null or invalid, throw an exception
@@ -62,18 +100,25 @@ namespace SS
             cell = new Cell(number);
             cells[name] = cell;
 
-            // Get cells that need to be recalculated
+            // Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
                 };
-            // Returns an enumeration, without duplicates, of the names of all cells that contain
-            // formulas containing name.
+            // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
             return dependentCells;
 
         }
 
-
+        /// <summary>
+        /// Set the content of the named cell with a text string
+        /// </summary>
+        /// <param name="name">Cell name</param>
+        /// <param name="text">String type input</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Thrown if the name is null</exception>
+        /// <exception cref="InvalidNameException">Thrown if the name is invalid</exception>
+        /// <exception cref="ArgumentNullException">If text parameter is null, throw an ArgumentNullException</exception>
         public override ISet<string> SetCellContents(string name, string text)
         {
             //If name is null and invalid then throw exception
@@ -85,6 +130,11 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
+            //Check if text is null
+            if(text == null)
+            {
+                throw new ArgumentNullException("Content cannot be null");
+            }
 
             Cell cell;
 
@@ -92,17 +142,26 @@ namespace SS
             cell = new Cell(text);
             cells[name] = cell;
 
-            //Get cells that need to be recalculated
+            // Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
                 };
-            // Returns an enumeration, without duplicates, of the names of all cells that contain
-            // formulas containing name.
+
+            // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
             return dependentCells;
 
         }
 
+        /// <summary>
+        /// Set the content of the named cell with a Formula
+        /// </summary>
+        /// <param name="name">Cell name</param>
+        /// <param name="text">Formula type input</param>
+        /// <returns></returns>
+        /// <exception cref="ArgumentException">Thrown if the name is null</exception>
+        /// <exception cref="InvalidNameException">Thrown if the name is invalid</exception>
+        /// <exception cref="ArgumentNullException">If formula parameter is null, throw an ArgumentNullException</exception>
         public override ISet<string> SetCellContents(string name, Formula formula)
         {
             //If name is null and invalid then throw exception
@@ -114,26 +173,36 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
+            //Check if formula is null
+            if (formula == null)
+            {
+                throw new ArgumentNullException("Content cannot be null");
+            }
 
             Cell cell;
 
             //Update the cell
             cell = new Cell(formula);
             cells[name] = cell;
+            //Add dependency for each var in formula to cell
             foreach (var Var in formula.GetVariables())
             {
                 dg.AddDependency(Var, name);
             }
-            // Get cells that need to be recalculated
+            // Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
                 };
-            // Returns an enumeration, without duplicates, of the names of all cells that contain
-            // formulas containing name.
+            // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
             return dependentCells;
         }
-
+        /// <summary>
+        /// Returns an enumeration, without duplicates, of the names of all cells whose
+        /// values depend directly on the value of the named cell.
+        /// </summary>
+        /// <param name="name">Named cell</param>
+        /// <returns></returns>
         protected override IEnumerable<string> GetDirectDependents(string name)
         {
             //Get the dependents by calling the GetDependents
@@ -146,29 +215,52 @@ namespace SS
             return Regex.IsMatch(name, @"^[a-zA-Z_][a-zA-Z0-9_]*$");
         }
 
-        //Cell class set up
+        /// <summary>
+        /// Represents a cell in a spreadsheet.
+        /// </summary>
         private class Cell
         {
+            /// <summary>
+            /// Gets or sets the content of the cell.
+            /// </summary>
             public object Content { get; private set; }
+
+            /// <summary>
+            /// Gets or sets the value of the cell.
+            /// </summary>
             public object Value { get; private set; }
 
+            /// <summary>
+            /// Initializes a new instance of the Cell class with a string content.
+            /// </summary>
+            /// <param name="name">The string content of the cell.</param>
             public Cell(string name)
             {
                 Content = name;
-                Value = name;
+                Value = name; 
             }
+
+            /// <summary>
+            /// Initializes a new instance of the Cell class with a double content.
+            /// </summary>
+            /// <param name="number">The double content of the cell.</param>
             public Cell(double number)
             {
                 Content = number;
-                Value = number;
+                Value = number; 
             }
+
+            /// <summary>
+            /// Initializes a new instance of the Cell class with a formula content.
+            /// </summary>
+            /// <param name="formula">The formula content of the cell.</param>
             public Cell(Formula formula)
             {
-                //If it was a formula maybe it was valid already ???
                 Content = formula;
-                Value = formula;
+                Value = formula; 
             }
         }
+
     }
 
 }

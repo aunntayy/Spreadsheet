@@ -300,12 +300,12 @@ namespace SS
         /// </summary>
         private void Visit(String start, String name, ISet<String> visited, LinkedList<String> changed)
         {
-            //add name of the cell
+            //Add name of the cell
             visited.Add(name);
-            //check each dependent of name
+            //Check each dependent of name
             foreach (String n in GetDirectDependents(name))
             {
-                //if a cell is the same with the start point then throw
+                //If a cell is the same with the start point then throw
                 if (n.Equals(start))
                 {
                     throw new CircularException();
