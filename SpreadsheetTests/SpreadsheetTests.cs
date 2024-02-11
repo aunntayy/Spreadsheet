@@ -194,6 +194,5 @@ namespace SpreadsheetTests
         ///<paragraph>
         ///End of the Functionality test
         ///</paragraph>
-
     }
 }

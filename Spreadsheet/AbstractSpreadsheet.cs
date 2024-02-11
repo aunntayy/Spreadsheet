@@ -298,6 +298,13 @@ namespace SS
         ///
         /// -- You should fully comment what is going on below using XML tags as appropriate --
         /// </summary>
+        /// <summary>
+        /// A helper method used by the GetCellsToRecalculate method to visit cells and their dependencies recursively.
+        /// </summary>
+        /// <param name="start">The starting cell being visited.</param>
+        /// <param name="name">The name of the current cell being visited.</param>
+        /// <param name="visited">A set containing names of cells already visited to avoid revisiting.</param>
+        /// <param name="changed">A linked list containing names of cells whose values have changed and need recalculation.</param>
         private void Visit(String start, String name, ISet<String> visited, LinkedList<String> changed)
         {
             //Add name of the cell
