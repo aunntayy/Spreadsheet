@@ -42,6 +42,8 @@ namespace SS
         // Dependency graph to track dependencies between cells
         DependencyGraph dg;
 
+        public override bool Changed { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
+
         /// <summary>
         /// Constructor set up for zero-argument constructor that creates an empty spreadsheet.
         /// </summary>
@@ -86,7 +88,7 @@ namespace SS
         /// <param name="number">Double type input</param>
         /// <returns>an enumeration, without duplicates, of the names of all cells that contain formulas containing name.</returns>
         /// <exception cref="InvalidNameException"></exception>
-        public override ISet<string> SetCellContents(string name, double number)
+        public override IList<string> SetCellContents(string name, double number)
         {
             // If name is null or invalid, throw an exception
             if (name is null || !isValid(name))
@@ -106,7 +108,7 @@ namespace SS
                     name
                 };
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
-            return dependentCells;
+            return (IList<string>)dependentCells;
 
         }
 
@@ -119,7 +121,7 @@ namespace SS
         /// <exception cref="ArgumentException">Thrown if the name is null</exception>
         /// <exception cref="InvalidNameException">Thrown if the name is invalid</exception>
         /// <exception cref="ArgumentNullException">If text parameter is null, throw an ArgumentNullException</exception>
-        public override ISet<string> SetCellContents(string name, string text)
+        public override IList<string> SetCellContents(string name, string text)
         {
             //If name is null and invalid then throw exception
             if (name is null)
@@ -213,6 +215,31 @@ namespace SS
         private bool isValid(string name)
         {
             return Regex.IsMatch(name, @"^[a-zA-Z_][a-zA-Z0-9_]*$");
+        }
+
+        public override IList<string> SetContentsOfCell(string name, string content)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string GetSavedVersion(string filename)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override void Save(string filename)
+        {
+            throw new NotImplementedException();
+        }
+
+        public override string GetXML()
+        {
+            throw new NotImplementedException();
+        }
+
+        public override object GetCellValue(string name)
+        {
+            throw new NotImplementedException();
         }
 
         /// <summary>
