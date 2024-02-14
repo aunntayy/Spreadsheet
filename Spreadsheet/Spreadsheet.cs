@@ -1,11 +1,14 @@
 ﻿using SpreadsheetUtilities;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
+using System.Reflection.Metadata;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
+using static FormulaEvaluator.Evaluator;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -41,17 +44,56 @@ namespace SS
         Dictionary<string, Cell> cells;
         // Dependency graph to track dependencies between cells
         DependencyGraph dg;
-
+        // Boolean to check change
+        bool change;
         public override bool Changed { get => throw new NotImplementedException(); protected set => throw new NotImplementedException(); }
 
         /// <summary>
         /// Constructor set up for zero-argument constructor that creates an empty spreadsheet.
         /// </summary>
-        public Spreadsheet()
+        public Spreadsheet(): base(s => true,s => s, "default")
         {
             // Initialize
             cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
+            bool change;
+        }
+        public Spreadsheet(Func<string,bool> isValid, Func<string,string>Normalizer,string version) : base(isValid, Normalizer, version)
+        {
+            cells = new Dictionary<string, Cell>();
+            dg = new DependencyGraph();
+            change = false;
+        }
+
+        public Spreadsheet(string Filepath, Func<string, bool> isValid, Func<string, string> Normalizer, string version) : base(isValid, Normalizer, version)
+        {
+            cells = new Dictionary<string, Cell>();
+            dg = new DependencyGraph();
+            change = false;
+        }
+        private class Cell
+        {
+            /// <summary>
+            /// Gets or sets the content of the cell.
+            /// </summary>
+            public object Content { get; private set; }
+
+            /// <summary>
+            /// Gets or sets the value of the cell.
+            /// </summary>
+            public object Value { get; private set; }
+
+            /// <summary>
+            /// Initializes a new instance of the Cell class with a string content.
+            /// </summary>
+            /// <param name="content">The content of the cell.</param>
+            public Cell(object content)
+            {
+                Content = content;
+                Value = content;
+
+               
+            }
         }
         /// <summary>
         /// Get the name of all non empty cell
@@ -88,10 +130,10 @@ namespace SS
         /// <param name="number">Double type input</param>
         /// <returns>an enumeration, without duplicates, of the names of all cells that contain formulas containing name.</returns>
         /// <exception cref="InvalidNameException"></exception>
-        public override IList<string> SetCellContents(string name, double number)
+        protected override IList<string> SetCellContents(string name, double number)
         {
             // If name is null or invalid, throw an exception
-            if (name is null || !isValid(name))
+            if (name is null || !isValid(name) || name == "")
             {
                 throw new InvalidNameException();
             }
@@ -121,7 +163,7 @@ namespace SS
         /// <exception cref="ArgumentException">Thrown if the name is null</exception>
         /// <exception cref="InvalidNameException">Thrown if the name is invalid</exception>
         /// <exception cref="ArgumentNullException">If text parameter is null, throw an ArgumentNullException</exception>
-        public override IList<string> SetCellContents(string name, string text)
+        protected override IList<string> SetCellContents(string name, string text)
         {
             //If name is null and invalid then throw exception
             if (name is null)
@@ -151,7 +193,7 @@ namespace SS
                 };
 
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
-            return dependentCells;
+            return (IList<string>)dependentCells;
 
         }
 
@@ -164,7 +206,7 @@ namespace SS
         /// <exception cref="ArgumentException">Thrown if the name is null</exception>
         /// <exception cref="InvalidNameException">Thrown if the name is invalid</exception>
         /// <exception cref="ArgumentNullException">If formula parameter is null, throw an ArgumentNullException</exception>
-        public override ISet<string> SetCellContents(string name, Formula formula)
+        protected override IList<string> SetCellContents(string name, Formula formula)
         {
             //If name is null and invalid then throw exception
             if (name is null)
@@ -197,7 +239,7 @@ namespace SS
                     name
                 };
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
-            return dependentCells;
+            return (IList<string>)dependentCells;
         }
         /// <summary>
         /// Returns an enumeration, without duplicates, of the names of all cells whose
@@ -219,7 +261,30 @@ namespace SS
 
         public override IList<string> SetContentsOfCell(string name, string content)
         {
-            throw new NotImplementedException();
+            HashSet<string> dependCell;
+            // If the name parameter is invalid, throw an InvalidNameException
+            if (!isValid(name) || name is null) { throw new InvalidNameException(); }
+            if (content is null) { throw new ArgumentNullException("content"); }
+
+            if (name == "") { return (IList<string>)(dependCell = new HashSet<string>(SetCellContents(name, content))); }
+         
+
+            if (double.TryParse(content, out double number)) 
+            {
+                dependCell = new HashSet<string>(SetCellContents(name, number));
+            }
+
+            if (name.StartsWith("="))
+            {
+                Formula f = new Formula(name, Normalize, IsValid);
+                dependCell = new HashSet<string>(SetCellContents(name, f));
+            }
+            else
+            {
+                dependCell = new HashSet<string>(SetCellContents(name, content));
+            }
+
+            return (IList<string>)dependCell;
         }
 
         public override string GetSavedVersion(string filename)
@@ -236,57 +301,22 @@ namespace SS
         {
             throw new NotImplementedException();
         }
-
+        // make it to have evaluate function
         public override object GetCellValue(string name)
         {
-            throw new NotImplementedException();
+            if (!isValid(name))
+            {
+                throw new InvalidNameException();
+            }
+
+            object content = GetCellContents(name);
+
+          
+                return content;
+            
         }
 
-        /// <summary>
-        /// Represents a cell in a spreadsheet.
-        /// </summary>
-        private class Cell
-        {
-            /// <summary>
-            /// Gets or sets the content of the cell.
-            /// </summary>
-            public object Content { get; private set; }
-
-            /// <summary>
-            /// Gets or sets the value of the cell.
-            /// </summary>
-            public object Value { get; private set; }
-
-            /// <summary>
-            /// Initializes a new instance of the Cell class with a string content.
-            /// </summary>
-            /// <param name="name">The string content of the cell.</param>
-            public Cell(string name)
-            {
-                Content = name;
-                Value = name; 
-            }
-
-            /// <summary>
-            /// Initializes a new instance of the Cell class with a double content.
-            /// </summary>
-            /// <param name="number">The double content of the cell.</param>
-            public Cell(double number)
-            {
-                Content = number;
-                Value = number; 
-            }
-
-            /// <summary>
-            /// Initializes a new instance of the Cell class with a formula content.
-            /// </summary>
-            /// <param name="formula">The formula content of the cell.</param>
-            public Cell(Formula formula)
-            {
-                Content = formula;
-                Value = formula; 
-            }
-        }
+        
 
     }
 

@@ -57,7 +57,7 @@ namespace SpreadsheetTests
         public void setInvalidCellName1()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("1A1", 1.0);
+            sheet.SetContentsOfCell("1A1", "1.0");
         }
 
         [TestMethod]
@@ -65,7 +65,7 @@ namespace SpreadsheetTests
         public void setNullCellName1()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents(null, 1.0);
+            sheet.SetContentsOfCell(null, "1.0");
         }
 
         //Set Cell content with text
@@ -74,7 +74,7 @@ namespace SpreadsheetTests
         public void setInvalidCellName2()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("1A", "hello");
+            sheet.SetContentsOfCell("1A", "hello");
         }
 
         [TestMethod]
@@ -82,7 +82,7 @@ namespace SpreadsheetTests
         public void setNullCellName2()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents(null, "hello");
+            sheet.SetContentsOfCell(null, "hello");
         }
 
         //Set Cell content with formula
@@ -91,7 +91,7 @@ namespace SpreadsheetTests
         public void setInvalidCellName3()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("1A", new Formula("A2+2"));
+            sheet.SetContentsOfCell("1A", "=A2+2");
         }
 
         [TestMethod]
@@ -99,7 +99,7 @@ namespace SpreadsheetTests
         public void setNullCellName3()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents(null, new Formula("A2+2"));
+            sheet.SetContentsOfCell("", "=A2+2");
         }
 
         [TestMethod]
@@ -107,7 +107,7 @@ namespace SpreadsheetTests
         public void setTextContentNull()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("B1", (string)null);
+            sheet.SetContentsOfCell("B1", null);
         }
 
         [TestMethod]
@@ -115,7 +115,7 @@ namespace SpreadsheetTests
         public void setFormulaContentNull()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("B1", (Formula)null);
+            sheet.SetContentsOfCell("B1", "=");
         }
 
         [TestMethod]
@@ -123,8 +123,8 @@ namespace SpreadsheetTests
         public void circularDependency()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("B1", new Formula("A1"));
-            sheet.SetCellContents("A1", new Formula("B1"));
+            sheet.SetContentsOfCell("B1", "=A1");
+            sheet.SetContentsOfCell("A1", "=B1");
         }
         ///<paragraph>
         ///End of exception test
@@ -142,10 +142,10 @@ namespace SpreadsheetTests
         {
             Spreadsheet sheet = new Spreadsheet();
             //Create a new cell and set it
-            sheet.SetCellContents("A1", 43.0);
+            sheet.SetContentsOfCell("A1", "43.0");
             Assert.AreEqual(43.0, sheet.GetCellContents("A1"));
             //Update Cell number type with new content
-            sheet.SetCellContents("A1", 69.0);
+            sheet.SetContentsOfCell("A1", "69.0");
             Assert.AreEqual(69.0, sheet.GetCellContents("A1"));
         }
 
@@ -154,10 +154,10 @@ namespace SpreadsheetTests
         {
             Spreadsheet sheet = new Spreadsheet();
             //Create a new cell and set it
-            sheet.SetCellContents("A1", "Hello");
+            sheet.SetContentsOfCell("A1", "Hello");
             Assert.AreEqual("Hello", sheet.GetCellContents("A1"));
             //Update Cell text type with new content
-            sheet.SetCellContents("A1", "Konichiwa");
+            sheet.SetContentsOfCell("A1", "Konichiwa");
             Assert.AreEqual("Konichiwa", sheet.GetCellContents("A1"));
         }
 
@@ -166,10 +166,10 @@ namespace SpreadsheetTests
         {
             Spreadsheet sheet = new Spreadsheet();
             //Create a new cell and set it
-            var cell = sheet.SetCellContents("A1", new Formula("A2+1"));
+            var cell = sheet.SetContentsOfCell("A1", "=A2+1");
             Assert.AreEqual("A2+1", sheet.GetCellContents("A1").ToString());
             //Update Cell formula type with new content
-            sheet.SetCellContents("A1", new Formula("A3+3"));
+            sheet.SetContentsOfCell("A1", "=A3+3");
             Assert.AreEqual("A3+3", sheet.GetCellContents("A1").ToString());
         }
 
@@ -177,9 +177,9 @@ namespace SpreadsheetTests
         public void getNameOfAllNonEmptyCellTest()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetCellContents("A1", new Formula("A2"));
-            sheet.SetCellContents("A2", new Formula("A3+3"));
-            sheet.SetCellContents("A3", new Formula("2+3+A4"));
+            sheet.SetContentsOfCell("A1", "=A2");
+            sheet.SetContentsOfCell("A2", "=A3+3");
+            sheet.SetContentsOfCell("A3", "=2+3+A4");
             var cell = sheet.GetNamesOfAllNonemptyCells();
             Assert.IsTrue(cell.Contains("A1"));
             Assert.IsTrue(cell.Contains("A2"));
