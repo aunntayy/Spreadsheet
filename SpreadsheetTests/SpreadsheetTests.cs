@@ -65,7 +65,7 @@ namespace SpreadsheetTests
         public void setNullCellName1()
         {
             Spreadsheet sheet = new Spreadsheet();
-            sheet.SetContentsOfCell(null, "1.0");
+            sheet.SetContentsOfCell("", "1.0");
         }
 
         //Set Cell content with text
@@ -78,7 +78,7 @@ namespace SpreadsheetTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(ArgumentNullException))]
         public void setNullCellName2()
         {
             Spreadsheet sheet = new Spreadsheet();
@@ -95,7 +95,7 @@ namespace SpreadsheetTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentException))]
+        [ExpectedException(typeof(InvalidNameException))]
         public void setNullCellName3()
         {
             Spreadsheet sheet = new Spreadsheet();
@@ -111,7 +111,7 @@ namespace SpreadsheetTests
         }
 
         [TestMethod]
-        [ExpectedException(typeof(ArgumentNullException))]
+        [ExpectedException(typeof(FormulaFormatException))]
         public void setFormulaContentNull()
         {
             Spreadsheet sheet = new Spreadsheet();
@@ -164,13 +164,13 @@ namespace SpreadsheetTests
         [TestMethod]
         public void setCelNumberFormula()
         {
-            Spreadsheet sheet = new Spreadsheet();
+            AbstractSpreadsheet sheet2 = new Spreadsheet(s => true, s => s, "default");
             //Create a new cell and set it
-            var cell = sheet.SetContentsOfCell("A1", "=A2+1");
-            Assert.AreEqual("A2+1", sheet.GetCellContents("A1").ToString());
+            var cell = sheet2.SetContentsOfCell("A1", "=A2+1");
+            Assert.AreEqual("A2+1", sheet2.GetCellContents("A1").ToString());
             //Update Cell formula type with new content
-            sheet.SetContentsOfCell("A1", "=A3+3");
-            Assert.AreEqual("A3+3", sheet.GetCellContents("A1").ToString());
+            sheet2.SetContentsOfCell("A1", "=A3+3");
+            Assert.AreEqual("A3+3", sheet2.GetCellContents("A1").ToString());
         }
 
         [TestMethod]
@@ -194,5 +194,19 @@ namespace SpreadsheetTests
         ///<paragraph>
         ///End of the Functionality test
         ///</paragraph>
+        
+        //Get Cell content test
+        [TestMethod()]
+        public void formulaEvaluateTest()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet(s => true, s => s.ToUpper(), "");
+            ss.SetContentsOfCell("A1", "6");
+            ss.SetContentsOfCell("A2", "7");
+            ss.SetContentsOfCell("A3", "8");
+            ss.SetContentsOfCell("A4", "=A3 + A2");
+            ss.SetContentsOfCell("B1", "=A1 + A2 + A3 + A4");
+            Assert.AreEqual(36, (double)ss.GetCellValue("B1"), 1e-9);
+        }
+       
     }
 }

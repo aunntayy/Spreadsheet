@@ -91,8 +91,6 @@ namespace SS
             {
                 Content = content;
                 Value = content;
-
-               
             }
         }
         /// <summary>
@@ -101,8 +99,7 @@ namespace SS
         /// <returns> All the cell name </returns>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
-            //return all the key that have value
-            return cells.Keys;
+            return cells.Where(keyValue => keyValue.Value.Content != null && !string.IsNullOrEmpty(keyValue.Value.Content.ToString())).Select(KeyValue => KeyValue.Key);
         }
 
         /// <summary>
@@ -114,7 +111,7 @@ namespace SS
         public override object GetCellContents(string name)
         {
             //If name is null and invalid then throw exception
-            if (name is null || !isValid(name))
+           if (name is null || !isValid(name) || name == "")
             {
                 throw new InvalidNameException();
             }
@@ -149,8 +146,10 @@ namespace SS
                 {
                     name
                 };
+            // Convert the HashSet<string> to IList<string>
+            IList<string> dependentCellsList = dependentCells.ToList();
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
-            return (IList<string>)dependentCells;
+            return dependentCellsList;
 
         }
 
@@ -165,19 +164,10 @@ namespace SS
         /// <exception cref="ArgumentNullException">If text parameter is null, throw an ArgumentNullException</exception>
         protected override IList<string> SetCellContents(string name, string text)
         {
-            //If name is null and invalid then throw exception
-            if (name is null)
-            {
-                throw new ArgumentException();
-            }
-            if (!isValid(name))
+            // If name is null or invalid, throw an exception
+            if (name is null || !isValid(name) || name == "")
             {
                 throw new InvalidNameException();
-            }
-            //Check if text is null
-            if(text == null)
-            {
-                throw new ArgumentNullException("Content cannot be null");
             }
 
             Cell cell;
@@ -192,8 +182,10 @@ namespace SS
                     name
                 };
 
+            // Convert the HashSet<string> to IList<string>
+            IList<string> dependentCellsList = dependentCells.ToList();
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
-            return (IList<string>)dependentCells;
+            return dependentCellsList;
 
         }
 
@@ -208,12 +200,8 @@ namespace SS
         /// <exception cref="ArgumentNullException">If formula parameter is null, throw an ArgumentNullException</exception>
         protected override IList<string> SetCellContents(string name, Formula formula)
         {
-            //If name is null and invalid then throw exception
-            if (name is null)
-            {
-                throw new ArgumentException();
-            }
-            if (!isValid(name))
+            // If name is null or invalid, throw an exception
+            if (name is null || !isValid(name) || name == "")
             {
                 throw new InvalidNameException();
             }
@@ -238,8 +226,10 @@ namespace SS
                 {
                     name
                 };
+            // Convert the HashSet<string> to IList<string>
+            IList<string> dependentCellsList = dependentCells.ToList();
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
-            return (IList<string>)dependentCells;
+            return dependentCellsList;
         }
         /// <summary>
         /// Returns an enumeration, without duplicates, of the names of all cells whose
@@ -261,30 +251,29 @@ namespace SS
 
         public override IList<string> SetContentsOfCell(string name, string content)
         {
-            HashSet<string> dependCell;
             // If the name parameter is invalid, throw an InvalidNameException
             if (!isValid(name) || name is null) { throw new InvalidNameException(); }
-            if (content is null) { throw new ArgumentNullException("content"); }
+            if (content is null) { throw new ArgumentNullException(); }
 
-            if (name == "") { return (IList<string>)(dependCell = new HashSet<string>(SetCellContents(name, content))); }
+            if (name == "") {return SetCellContents(name, content); }
          
 
             if (double.TryParse(content, out double number)) 
             {
-                dependCell = new HashSet<string>(SetCellContents(name, number));
+                return SetCellContents(name, number);
             }
 
-            if (name.StartsWith("="))
-            {
-                Formula f = new Formula(name, Normalize, IsValid);
-                dependCell = new HashSet<string>(SetCellContents(name, f));
+            if (content.StartsWith("="))
+            {   
+                //trim of the "="
+                content = content.Substring(1);
+                //pass into formula constructor
+                Formula f = new Formula(content, Normalize, IsValid);
+                return SetCellContents(name, f);
             }
-            else
-            {
-                dependCell = new HashSet<string>(SetCellContents(name, content));
-            }
+         
 
-            return (IList<string>)dependCell;
+            return SetCellContents(name, content);
         }
 
         public override string GetSavedVersion(string filename)
@@ -304,20 +293,24 @@ namespace SS
         // make it to have evaluate function
         public override object GetCellValue(string name)
         {
-            if (!isValid(name))
-            {
-                throw new InvalidNameException();
+            // If name is invalid, throws an InvalidNameException.
+            if (!isValid(name) || name is null) 
+            { 
+                throw new InvalidNameException(); 
             }
+            //Assign the value type depend on the content
+            object value = GetCellContents(name);
+            //If formula
+            if (value.GetType() == typeof(Formula)) 
+            {   
+                Formula formula = (Formula)value;
+                //Recursivly evaluate the formula 
+                return formula.Evaluate(s => (double)GetCellValue(s));
 
-            object content = GetCellContents(name);
-
-          
-                return content;
+            }
+            return value;
             
         }
-
-        
-
     }
 
 }
