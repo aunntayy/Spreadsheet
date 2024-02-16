@@ -58,7 +58,20 @@ namespace SS
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
             //return all the key that have value
-            return cells.Where(keyValue => keyValue.Value.Content != null && !string.IsNullOrEmpty(keyValue.Value.Content.ToString())).Select(KeyValue => KeyValue.Key);
+            List<string> nonEmptyCellKeys = new List<string>();
+
+            foreach (var keyValue in cells)
+            {
+                // Check if the content is not null and not an empty string
+                if (keyValue.Value.Content != null && !string.IsNullOrEmpty(keyValue.Value.Content.ToString()))
+                {
+                    // Add the key to the list of non-empty cell keys
+                    nonEmptyCellKeys.Add(keyValue.Key);
+                }
+            }
+
+            return nonEmptyCellKeys;
+
         }
 
         /// <summary>
@@ -75,7 +88,15 @@ namespace SS
                 throw new InvalidNameException();
             }
             //Make sure every cell return an empty string
-            if (!cells.ContainsKey(name)) { return ""; }
+          
+            if (!cells.ContainsKey(name))
+            {
+                return "";
+            }
+            if ((cells[name].Content == null || cells[name].Content.ToString() == ""))
+            {
+                return "";
+            }
             //Get the contents
             return cells[name].Content;
         }
@@ -183,17 +204,24 @@ namespace SS
 
             //Update the cell
             cell = new Cell(formula);
-            cells[name] = cell;
             //Add dependency for each var in formula to cell
             foreach (var Var in formula.GetVariables())
             {
-                dg.AddDependency(Var, name);
+                try
+                {
+                    dg.AddDependency(Var, name);
+                }
+                catch (InvalidOperationException)
+                {
+                    throw new CircularException();
+                }
             }
             // Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
                 };
+            cells[name] = cell;
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
             return dependentCells;
         }
