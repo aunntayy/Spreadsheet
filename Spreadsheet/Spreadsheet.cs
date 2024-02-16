@@ -58,7 +58,7 @@ namespace SS
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
             //return all the key that have value
-            return cells.Keys;
+            return cells.Where(keyValue => keyValue.Value.Content != null && !string.IsNullOrEmpty(keyValue.Value.Content.ToString())).Select(KeyValue => KeyValue.Key);
         }
 
         /// <summary>
