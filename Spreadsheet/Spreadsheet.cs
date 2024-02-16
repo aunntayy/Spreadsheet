@@ -51,14 +51,14 @@ namespace SS
         /// <summary>
         /// Constructor set up for zero-argument constructor that creates an empty spreadsheet.
         /// </summary>
-        public Spreadsheet(): base(s => true,s => s, "default")
+        public Spreadsheet() : base(s => true, s => s, "default")
         {
             // Initialize
             cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
             bool change;
         }
-        public Spreadsheet(Func<string,bool> isValid, Func<string,string>Normalizer,string version) : base(isValid, Normalizer, version)
+        public Spreadsheet(Func<string, bool> isValid, Func<string, string> Normalizer, string version) : base(isValid, Normalizer, version)
         {
             cells = new Dictionary<string, Cell>();
             dg = new DependencyGraph();
@@ -111,7 +111,7 @@ namespace SS
         public override object GetCellContents(string name)
         {
             //If name is null and invalid then throw exception
-           if (name is null || !isValid(name) || name == "")
+            if (name is null || !isValid(name) || name == "")
             {
                 throw new InvalidNameException();
             }
@@ -255,23 +255,23 @@ namespace SS
             if (!isValid(name) || name is null) { throw new InvalidNameException(); }
             if (content is null) { throw new ArgumentNullException(); }
 
-            if (name == "") {return SetCellContents(name, content); }
-         
+            if (name == "") { return SetCellContents(name, content); }
 
-            if (double.TryParse(content, out double number)) 
+
+            if (double.TryParse(content, out double number))
             {
                 return SetCellContents(name, number);
             }
 
             if (content.StartsWith("="))
-            {   
+            {
                 //trim of the "="
                 content = content.Substring(1);
                 //pass into formula constructor
                 Formula f = new Formula(content, Normalize, IsValid);
                 return SetCellContents(name, f);
             }
-         
+
 
             return SetCellContents(name, content);
         }
@@ -294,22 +294,21 @@ namespace SS
         public override object GetCellValue(string name)
         {
             // If name is invalid, throws an InvalidNameException.
-            if (!isValid(name) || name is null) 
-            { 
-                throw new InvalidNameException(); 
+            if (!isValid(name) || name is null)
+            {
+                throw new InvalidNameException();
             }
             //Assign the value type depend on the content
             object value = GetCellContents(name);
             //If formula
-            if (value.GetType() == typeof(Formula)) 
-            {   
+            if (value.GetType() == typeof(Formula))
+            {
                 Formula formula = (Formula)value;
                 //Recursivly evaluate the formula 
                 return formula.Evaluate(s => (double)GetCellValue(s));
-
             }
             return value;
-            
+
         }
     }
 
