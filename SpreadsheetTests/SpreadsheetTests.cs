@@ -201,12 +201,25 @@ namespace SpreadsheetTests
         {
             AbstractSpreadsheet ss = new Spreadsheet(s => true, s => s.ToUpper(), "");
             ss.SetContentsOfCell("A1", "6");
-            ss.SetContentsOfCell("_A2", "7");
+            ss.SetContentsOfCell("A2", "7");
             ss.SetContentsOfCell("A3", "8");
-            ss.SetContentsOfCell("A4", "=A3 + _A2");
-            ss.SetContentsOfCell("B1", "=A1 + _A2 + A3 + A4");
+            ss.SetContentsOfCell("A4", "=A3 + A2");
+            ss.SetContentsOfCell("B1", "=A1 + A2 + A3 + A4");
             Assert.AreEqual(36, (double)ss.GetCellValue("B1"), 1e-9);
         }
-       
+        [TestMethod]
+        public void formulaEvaluateTest2()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.SetContentsOfCell("A1","=A2+A3");
+            ss.SetContentsOfCell("A2", "=A4 + 5");
+            ss.SetContentsOfCell("A3", "=8 + A4");
+            ss.SetContentsOfCell("A4", "=13.0");
+            Assert.AreEqual(39.0,ss.GetCellValue("A1"));
+            Assert.AreEqual(18.0, ss.GetCellValue("A2"));
+            Assert.AreEqual(21.0, ss.GetCellValue("A3"));
+            ss.SetContentsOfCell("A2","=A4 + 5 + 6");
+            Assert.AreEqual(45.0,ss.GetCellValue("A1"));
+        }
     }
 }
