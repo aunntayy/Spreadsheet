@@ -221,5 +221,6 @@ namespace SpreadsheetTests
             ss.SetContentsOfCell("A2","=A4 + 5 + 6");
             Assert.AreEqual(45.0,ss.GetCellValue("A1"));
         }
+   
     }
 }

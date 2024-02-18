@@ -75,7 +75,12 @@ namespace SS
         {
             if (!File.Exists(filepath))
                 throw new SpreadsheetReadWriteException("File not found." + filepath);
+            string savedVersion = GetSavedVersion(filepath);
 
+            // Check if the saved version matches the expected version
+            if (!version.Equals(savedVersion))
+                throw new SpreadsheetReadWriteException("Incorrect version");
+            
             // Load spreadsheet data from XML file
             LoadFromXml(filepath);
         }
