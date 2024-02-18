@@ -88,7 +88,7 @@ namespace SS
                 throw new InvalidNameException();
             }
             //Make sure every cell return an empty string
-          
+
             if (!cells.ContainsKey(name))
             {
                 return "";
@@ -109,24 +109,25 @@ namespace SS
         /// <exception cref="InvalidNameException"></exception>
         public override ISet<string> SetCellContents(string name, double number)
         {
-            // If name is null or invalid, throw an exception
+            //If name is null or invalid, throw an exception
             if (name is null || !isValid(name))
             {
                 throw new InvalidNameException();
             }
 
-            Cell cell;
-
-            // Update the cell
-            cell = new Cell(number);
+            //Update the cell with the given number
+            Cell cell = new Cell(number);
             cells[name] = cell;
 
-            // Get cells that need to be recalculated then add name
+            //Replace the dependents of 'name' in the dependency graph with an empty set
+            dg.ReplaceDependees(name, new HashSet<string>());
+            //Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
                 };
-            // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
+
+            //Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
             return dependentCells;
 
         }
@@ -152,24 +153,22 @@ namespace SS
                 throw new InvalidNameException();
             }
             //Check if text is null
-            if(text == null)
+            if (text == null)
             {
                 throw new ArgumentNullException("Content cannot be null");
             }
 
-            Cell cell;
-
-            // Update the cell
-            cell = new Cell(text);
+            //Update the cell
+            Cell cell = new Cell(text);
             cells[name] = cell;
 
-            // Get cells that need to be recalculated then add name
+            //Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
                 };
 
-            // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
+            //Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
             return dependentCells;
 
         }
@@ -200,30 +199,30 @@ namespace SS
                 throw new ArgumentNullException("Content cannot be null");
             }
 
-            Cell cell;
+            // Store the original dependees to restore in case of a circular exception
+            IEnumerable<string> originalDependees = dg.GetDependees(name);
 
-            //Update the cell
-            cell = new Cell(formula);
-            //Add dependency for each var in formula to cell
-            foreach (var Var in formula.GetVariables())
+            try
             {
-                try
-                {
-                    dg.AddDependency(Var, name);
-                }
-                catch (InvalidOperationException)
-                {
-                    throw new CircularException();
-                }
+                // Update dependency graph with new dependees from the formula
+                dg.ReplaceDependees(name, formula.GetVariables());
+
+                // Get the cells that need to be recalculated
+                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
+
+                // Update the cell with the new formula
+                Cell cell = new Cell(formula);
+                cells[name] = cell;
+
+                // Return the cells that need to be recalculated
+                return dependentCells;
             }
-            // Get cells that need to be recalculated then add name
-            HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
-                {
-                    name
-                };
-            cells[name] = cell;
-            // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
-            return dependentCells;
+            catch (CircularException)
+            {
+                // Restore original dependees if a circular exception is detected
+                dg.ReplaceDependees(name, originalDependees);
+                throw;
+            }
         }
         /// <summary>
         /// Returns an enumeration, without duplicates, of the names of all cells whose
@@ -265,7 +264,7 @@ namespace SS
             public Cell(string name)
             {
                 Content = name;
-                Value = name; 
+                Value = name;
             }
 
             /// <summary>
@@ -275,7 +274,7 @@ namespace SS
             public Cell(double number)
             {
                 Content = number;
-                Value = number; 
+                Value = number;
             }
 
             /// <summary>
@@ -285,7 +284,7 @@ namespace SS
             public Cell(Formula formula)
             {
                 Content = formula;
-                Value = formula; 
+                Value = formula;
             }
         }
 
