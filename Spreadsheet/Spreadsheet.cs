@@ -99,7 +99,20 @@ namespace SS
         /// <returns> All the cell name </returns>
         public override IEnumerable<string> GetNamesOfAllNonemptyCells()
         {
-            return cells.Where(keyValue => keyValue.Value.Content != null && !string.IsNullOrEmpty(keyValue.Value.Content.ToString())).Select(KeyValue => KeyValue.Key);
+            //return all the key that have value
+            List<string> nonEmptyCellKeys = new List<string>();
+
+            foreach (var keyValue in cells)
+            {
+                // Check if the content is not null and not an empty string
+                if (keyValue.Value.Content != null && !string.IsNullOrEmpty(keyValue.Value.Content.ToString()))
+                {
+                    // Add the key to the list of non-empty cell keys
+                    nonEmptyCellKeys.Add(keyValue.Key);
+                }
+            }
+
+            return nonEmptyCellKeys;
         }
 
         /// <summary>
@@ -111,12 +124,20 @@ namespace SS
         public override object GetCellContents(string name)
         {
             //If name is null and invalid then throw exception
-            if (name is null || !isValid(name) || name == "")
+            if (name is null || !isValid(name))
             {
                 throw new InvalidNameException();
             }
             //Make sure every cell return an empty string
-            if (!cells.ContainsKey(name)) { return ""; }
+
+            if (!cells.ContainsKey(name))
+            {
+                return "";
+            }
+            if ((cells[name].Content == null || cells[name].Content.ToString() == ""))
+            {
+                return "";
+            }
             //Get the contents
             return cells[name].Content;
         }
@@ -129,19 +150,19 @@ namespace SS
         /// <exception cref="InvalidNameException"></exception>
         protected override IList<string> SetCellContents(string name, double number)
         {
-            // If name is null or invalid, throw an exception
-            if (name is null || !isValid(name) || name == "")
+            //If name is null or invalid, throw an exception
+            if (name is null || !isValid(name))
             {
                 throw new InvalidNameException();
             }
 
-            Cell cell;
-
-            // Update the cell
-            cell = new Cell(number);
+            //Update the cell with the given number
+            Cell cell = new Cell(number);
             cells[name] = cell;
 
-            // Get cells that need to be recalculated then add name
+            //Replace the dependents of 'name' in the dependency graph with an empty set
+            dg.ReplaceDependees(name, new HashSet<string>());
+            //Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
@@ -150,7 +171,6 @@ namespace SS
             IList<string> dependentCellsList = dependentCells.ToList();
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
             return dependentCellsList;
-
         }
 
         /// <summary>
@@ -169,19 +189,21 @@ namespace SS
             {
                 throw new InvalidNameException();
             }
+            //Check if text is null
+            if (text == null)
+            {
+                throw new ArgumentNullException("Content cannot be null");
+            }
 
-            Cell cell;
-
-            // Update the cell
-            cell = new Cell(text);
+            //Update the cell
+            Cell cell = new Cell(text);
             cells[name] = cell;
 
-            // Get cells that need to be recalculated then add name
+            //Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
                 };
-
             // Convert the HashSet<string> to IList<string>
             IList<string> dependentCellsList = dependentCells.ToList();
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
@@ -211,25 +233,33 @@ namespace SS
                 throw new ArgumentNullException("Content cannot be null");
             }
 
-            Cell cell;
+            // Store the original dependees to restore in case of a circular exception
+            IEnumerable<string> originalDependees = dg.GetDependees(name);
 
-            //Update the cell
-            cell = new Cell(formula);
-            cells[name] = cell;
-            //Add dependency for each var in formula to cell
-            foreach (var Var in formula.GetVariables())
+            try
             {
-                dg.AddDependency(Var, name);
+                // Update dependency graph with new dependees from the formula
+                dg.ReplaceDependees(name, formula.GetVariables());
+
+                // Get the cells that need to be recalculated
+                HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name));
+
+                // Update the cell with the new formula
+                Cell cell = new Cell(formula);
+                cells[name] = cell;
+
+                // Convert the HashSet<string> to IList<string>
+                IList<string> dependentCellsList = dependentCells.ToList();
+
+                // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
+                return dependentCellsList;
             }
-            // Get cells that need to be recalculated then add name
-            HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
-                {
-                    name
-                };
-            // Convert the HashSet<string> to IList<string>
-            IList<string> dependentCellsList = dependentCells.ToList();
-            // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
-            return dependentCellsList;
+            catch (CircularException)
+            {
+                // Restore original dependees if a circular exception is detected
+                dg.ReplaceDependees(name, originalDependees);
+                throw;
+            }
         }
         /// <summary>
         /// Returns an enumeration, without duplicates, of the names of all cells whose
