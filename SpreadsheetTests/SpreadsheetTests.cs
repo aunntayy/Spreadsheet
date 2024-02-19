@@ -8,7 +8,7 @@ namespace SpreadsheetTests
     /// <summary>
     /// Author:    Phuc Hoang
     /// Partner:   -None-
-    /// Date:      10-Feb-2024
+    /// Date:      14-Feb-2024
     /// Course:    CS 3500, University of Utah, School of Computing
     /// Copyright: CS 3500 and Phuc Hoang - This work may not 
     ///            be copied for use in Academic Coursework.
@@ -20,7 +20,7 @@ namespace SpreadsheetTests
     ///
     /// File Contents
     ///
-    ///    [This file contains the test for Spreedsheet Class]
+    ///    [This file contains the upadted test for Spreedsheet Class]
     ///    
     /// </summary>
     

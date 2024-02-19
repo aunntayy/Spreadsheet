@@ -18,7 +18,7 @@ namespace SS
     /// <summary>
     /// Author:    Phuc Hoang
     /// Partner:   -None-
-    /// Date:      10-Feb-2024
+    /// Date:      14-Feb-2024
     /// Course:    CS 3500, University of Utah, School of Computing
     /// Copyright: CS 3500 and Phuc Hoang - This work may not 
     ///            be copied for use in Academic Coursework.
@@ -30,7 +30,7 @@ namespace SS
     ///
     /// File Contents
     ///
-    ///    [This file contains the implementation of a spreadsheet application 
+    ///    [This file contains the updated implementation of a spreadsheet application 
     ///    for CS 3500 course. It includes classes and methods related to managing
     ///    and manipulating spreadsheet data.]
     ///    
