@@ -70,71 +70,66 @@ namespace SS
             changed = false;
         }
 
+
         public Spreadsheet(string filepath, Func<string, bool> isValid, Func<string, string> normalize, string version)
-             : this(isValid, normalize, version)
+            : this(isValid, normalize, version)
         {
             if (!File.Exists(filepath))
-                throw new SpreadsheetReadWriteException("File not found." + filepath);
-            string savedVersion = GetSavedVersion(filepath);
+            {
+                throw new SpreadsheetReadWriteException("File not found: " + filepath);
+            }
 
-            // Check if the saved version matches the expected version
-            if (!version.Equals(savedVersion))
-                throw new SpreadsheetReadWriteException("Incorrect version");
+            string savedVersion = GetSavedVersion(filepath);
             
-            // Load spreadsheet data from XML file
-            LoadFromXml(filepath);
+            if (!version.Equals(savedVersion))
+            {
+                throw new SpreadsheetReadWriteException("Incorrect version: Expected " + version + ", but found " + savedVersion);
+            }
+                LoadXml(filepath);
         }
 
-        // Method to load spreadsheet data from XML file
-        private void LoadFromXml(string filepath)
+        private void LoadXml(string filepath)
         {
-            try
+            using (XmlReader reader = XmlReader.Create(filepath))
             {
-                using (XmlReader reader = XmlReader.Create(filepath))
+                while (reader.Read())
                 {
-                    string cellName = string.Empty;
-                    string cellContent = string.Empty;
-
-                    // Read until the end of the XML file
-                    while (reader.Read())
+                    if (reader.NodeType == XmlNodeType.Element && reader.Name == "cell")
                     {
-                        // Skip whitespace nodes
-                        if (reader.NodeType == XmlNodeType.Whitespace)
-                            continue;
-
-                        if (reader.NodeType == XmlNodeType.Element && reader.Name == "cell")
-                        {
-                            // Reset name and content for each new cell
-                            cellName = string.Empty;
-                            cellContent = string.Empty;
-                        }
-                        else if (reader.NodeType == XmlNodeType.Element && reader.Name == "name")
-                        {
-                            // Read the name element
-                            cellName = reader.ReadElementContentAsString();
-                        }
-                        else if (reader.NodeType == XmlNodeType.Element && reader.Name == "contents")
-                        {
-                            // Read the contents element
-                            cellContent = reader.ReadElementContentAsString();
-                        }
-
-                        // If both name and content are read, set the contents of the cell
-                        if (!string.IsNullOrEmpty(cellName) && !string.IsNullOrEmpty(cellContent))
-                        {
-                            SetContentsOfCell(cellName, cellContent);
-                            // Reset name and content for the next cell
-                            cellName = string.Empty;
-                            cellContent = string.Empty;
-                        }
+                        LoadCell(reader);
                     }
                 }
             }
-            catch (Exception ex)
+        }
+
+        private void LoadCell(XmlReader reader)
+        {
+            string cellName = null;
+            string cellContent = null;
+
+            while (reader.Read())
             {
-                throw new SpreadsheetReadWriteException("Error reading file: " + ex.Message);
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    if (reader.Name == "name")
+                    {
+                        cellName = reader.ReadElementContentAsString();
+                    }
+                    else if (reader.Name == "contents")
+                    {
+                        cellContent = reader.ReadElementContentAsString();
+                    }
+                }
+
+                if (cellName != null && cellContent != null)
+                {
+                    SetContentsOfCell(cellName, cellContent);
+                    cellName = null;
+                    cellContent = null;
+                }
             }
         }
+
 
         internal class Cell
         {
@@ -252,12 +247,6 @@ namespace SS
         /// </returns>
         protected override IList<string> SetCellContents(string name, double number)
         {
-            //If name is null or invalid, throw an exception
-            if (name is null || !isValid(name))
-            {
-                throw new InvalidNameException();
-            }
-
             //Update the cell with the given number
             Cell cell = new Cell(number);
             cells[name] = cell;
@@ -310,17 +299,6 @@ namespace SS
         /// </returns>
         protected override IList<string> SetCellContents(string name, string text)
         {
-            // If name is null or invalid, throw an exception
-            if (name is null || !isValid(name) || name == "")
-            {
-                throw new InvalidNameException();
-            }
-            //Check if text is null
-            if (text == null)
-            {
-                throw new ArgumentNullException("Content cannot be null");
-            }
-
             //Update the cell
             Cell cell = new Cell(text);
             cells[name] = cell;
@@ -334,7 +312,6 @@ namespace SS
             IList<string> dependentCellsList = dependentCells.ToList();
             // Returns an enumeration, without duplicates, of the names of all cells that contain formulas containing name.
             return dependentCellsList;
-
         }
 
         /// <summary>
@@ -378,16 +355,6 @@ namespace SS
         /// </returns>
         protected override IList<string> SetCellContents(string name, Formula formula)
         {
-            // If name is null or invalid, throw an exception
-            if (name is null || !isValid(name) || name == "")
-            {
-                throw new InvalidNameException();
-            }
-            //Check if formula is null
-            if (formula == null)
-            {
-                throw new ArgumentNullException("Content cannot be null");
-            }
 
             // Store the original dependees to restore in case of a circular exception
             IEnumerable<string> originalDependees = dg.GetDependees(name);
@@ -526,13 +493,13 @@ namespace SS
         public override IList<string> SetContentsOfCell(string name, string content)
         {
             // If the name parameter is invalid, throw an InvalidNameException
-            if(!IsValid(name)) { throw new InvalidNameException(); }
+            if (!IsValid(name)) { throw new InvalidNameException(); }
             if (!isValid(name) || name is null) { throw new InvalidNameException(); }
             if (content is null) { throw new ArgumentNullException(); }
 
             if (name == "") { return SetCellContents(name, content); }
 
-              if (double.TryParse(content, out double number))
+            if (double.TryParse(content, out double number))
             {
                 return SetCellContents(name, number);
             }
@@ -590,12 +557,11 @@ namespace SS
                             else
                             {
                                 // If the version attribute is missing, throw an exception
-                                throw new SpreadsheetReadWriteException("Version attribute not found in the XML file.");
+                                throw new SpreadsheetReadWriteException("Cannot find file version" + filename);
                             }
                         }
                     }
                 }
-
                 // If the start element of the spreadsheet was not found, throw an exception
                 throw new SpreadsheetReadWriteException("Spreadsheet element not found in the XML file.");
             }
@@ -633,11 +599,40 @@ namespace SS
         {
             try
             {
-                // Create an XML writer with indentation for readability
-                XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
-                settings.IndentChars = "  ";
+                // Get the XML representation of the spreadsheet's contents
+                string xmlContent = GetXML();
 
-                using (XmlWriter writer = XmlWriter.Create(filename, settings))
+                // Write the XML content to the specified file
+                File.WriteAllText(filename, xmlContent);
+
+                // Update the Changed property after successful save
+                Changed = false;
+            }
+            catch (Exception e)
+            {
+                throw new SpreadsheetReadWriteException("Error saving spreadsheet: " + e.Message);
+            }
+        }
+
+        /// <summary>
+        ///   Return an XML representation of the spreadsheet's contents
+        /// </summary>
+        /// <returns> contents in XML form </returns>
+        public override string GetXML()
+        {
+            // Create a MemoryStream to capture XML content
+            using (MemoryStream memoryStream = new MemoryStream())
+            {
+                // Create an XML writer with indentation for readability and UTF-8 encoding
+                XmlWriterSettings settings = new XmlWriterSettings()
+                {
+                    Indent = true,
+                    Encoding = Encoding.UTF8, // Specify UTF-8 encoding
+                    OmitXmlDeclaration = false // Include XML declaration
+                };
+
+                // Create the XML writer with the MemoryStream and settings
+                using (XmlWriter writer = XmlWriter.Create(memoryStream, settings))
                 {
                     // Start the root element
                     writer.WriteStartElement("spreadsheet");
@@ -656,19 +651,18 @@ namespace SS
                         writer.WriteElementString("name", cellName);
 
                         // Write the contents element based on the type of content
-                        switch (cell.Content)
+                        if (cell.Content is double)
                         {
-                            case double doubleContent:
-                                writer.WriteElementString("contents", doubleContent.ToString());
-                                break;
-                            case string stringContent:
-                                writer.WriteElementString("contents", stringContent);
-                                break;
-                            case Formula formulaContent:
-                                writer.WriteElementString("contents", "=" + formulaContent.ToString());
-                                break;
-                            default:
-                                throw new SpreadsheetReadWriteException("Unsupported cell content type: " + cell.Content.GetType().FullName);
+                            writer.WriteElementString("contents", cell.Content.ToString());
+                        }
+                        else if (cell.Content is string)
+                        {
+                            writer.WriteElementString("contents", (string)cell.Content);
+                        }
+                        else if (cell.Content is Formula)
+                        {
+                            Formula formula = (Formula)cell.Content;
+                            writer.WriteElementString("contents", "=" + formula.ToString());
                         }
 
                         // End the cell element
@@ -677,74 +671,22 @@ namespace SS
 
                     // End the spreadsheet element
                     writer.WriteEndElement();
+
+                    // Flush the writer to ensure all content is written to the stream
+                    writer.Flush();
                 }
 
-                // Update the Changed property after successful save
-                Changed = false;
-            }
-            catch (Exception e)
-            {
-                throw new SpreadsheetReadWriteException("");
+                // Convert the XML content to a string using UTF-8 encoding
+                string xmlString = Encoding.UTF8.GetString(memoryStream.ToArray());
+
+                // Return the XML content as a string
+                return xmlString;
             }
         }
 
-        /// <summary>
-        ///   Return an XML representation of the spreadsheet's contents
-        /// </summary>
-        /// <returns> contents in XML form </returns>
-        public override string GetXML()
-        {
-            // Create a StringBuilder to construct the XML content
-            StringBuilder xmlBuilder = new StringBuilder();
 
-            StringWriter stringWriter = new StringWriter(xmlBuilder);
 
-            // Create an XML writer with indentation for readability
-            XmlWriterSettings settings = new XmlWriterSettings() { Indent = true };
-             settings.IndentChars = "  ";
-            using (XmlWriter writer = XmlWriter.Create(stringWriter, settings))
-            {
-                // Start the root element
-                writer.WriteStartElement("spreadsheet");
-                writer.WriteAttributeString("version", Version);
 
-                // Iterate over each cell in the spreadsheet
-                foreach (var kvp in cells)
-                {
-                    string cellName = kvp.Key;
-                    Cell cell = kvp.Value;
-
-                    // Start the cell element
-                    writer.WriteStartElement("cell");
-
-                    // Write the name element
-                    writer.WriteElementString("name", cellName);
-
-                    // Write the contents element based on the type of content
-                    if (cell.Content is double)
-                    {
-                        writer.WriteElementString("contents", cell.Content.ToString());
-                    }
-                    else if (cell.Content is string)
-                    {
-                        writer.WriteElementString("contents", (string)cell.Content);
-                    }
-                    else if (cell.Content is Formula)
-                    {
-                        Formula formula = (Formula)cell.Content;
-                        writer.WriteElementString("contents", "=" + formula.ToString());
-                    }
-
-                    // End the cell element
-                    writer.WriteEndElement();
-                }
-
-                // End the spreadsheet element
-                writer.WriteEndElement();
-            }
-            // Return the XML content as a string
-            return xmlBuilder.ToString();
-        }
 
         /// <summary>
         /// If name is invalid, throws an InvalidNameException.
