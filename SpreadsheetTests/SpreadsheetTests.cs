@@ -323,37 +323,37 @@ namespace SpreadsheetTests
         //    string version = ss.GetSavedVersion(filename);
         //}
         //
-        //[TestMethod]
-        //public void TestErrorReadingFile()
-        //{
-        //    // Create a new instance of your spreadsheet class
-        //    Spreadsheet ss = new Spreadsheet();
-        //
-        //    // Populate the spreadsheet with some data (cells)
-        //    // For demonstration purposes, let's assume cells contain some values
-        //    ss.SetContentsOfCell("A1", "Hello");
-        //    ss.SetContentsOfCell("B2", "123");
-        //    ss.SetContentsOfCell("C3", "=A1 + B2");
-        //
-        //    // Call the GetXML method to get the XML representation of the spreadsheet
-        //    string xml = ss.GetXML();
-        //
-        //    // Assert that the XML string is not empty
-        //    Assert.IsFalse(string.IsNullOrEmpty(xml));
-        //}
+        [TestMethod]
+        public void TestErrorReadingFile()
+        {
+            // Create a new instance of your spreadsheet class
+            Spreadsheet ss = new Spreadsheet();
+        
+            // Populate the spreadsheet with some data (cells)
+            // For demonstration purposes, let's assume cells contain some values
+            ss.SetContentsOfCell("A1", "Hello");
+            ss.SetContentsOfCell("B2", "123");
+            ss.SetContentsOfCell("C3", "=A1 + B2");
+        
+            // Call the GetXML method to get the XML representation of the spreadsheet
+            string xml = ss.GetXML();
+        
+            // Assert that the XML string is not empty
+            Assert.IsFalse(string.IsNullOrEmpty(xml));
+        }
 
-        ////Missing version atributte
-        //[TestMethod]
-        //[ExpectedException(typeof(SpreadsheetReadWriteException))]
-        //public void TestReadFile()
-        //{
-        //    // Create a temporary XML file without the version attribute
-        //    string filename = "save4.txt";
-        //
-        //    // Call GetSavedVersion with the temporary XML file
-        //    Spreadsheet ss = new Spreadsheet("save4.txt", s => true, s => s, "");
-        //    string version = ss.GetSavedVersion(filename);
-        //}
+        //Missing version atributte
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadWriteException))]
+        public void TestReadFile()
+        {
+            // Create a temporary XML file without the version attribute
+            string filename = "save4.txt";
+        
+            // Call GetSavedVersion with the temporary XML file
+            Spreadsheet ss = new Spreadsheet("save4.txt", s => true, s => s, "");
+            string version = ss.GetSavedVersion(filename);
+        }
 
         //[TestMethod]
         //public void TestSaveFile()
