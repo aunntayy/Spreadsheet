@@ -367,15 +367,15 @@ namespace SpreadsheetTests
             // Call the constructor with the temporary XML file, which should throw an exception
             Assert.ThrowsException<SpreadsheetReadWriteException>(() => new Spreadsheet(filename, s => true, s => s, ""));
         }
-        //
-        //[TestMethod]
-        //[ExpectedException(typeof(SpreadsheetReadWriteException))]
-        //// Save to non exist path
-        //public void SaveNonExist()
-        //{
-        //    AbstractSpreadsheet ss = new Spreadsheet();
-        //    ss.Save("/save4.txt");
-        //}
+        
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadWriteException))]
+        // Save to non exist path
+        public void SaveNonExist()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.Save("\\save4.txt");
+        }
 
     }
 }
