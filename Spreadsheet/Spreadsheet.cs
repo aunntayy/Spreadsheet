@@ -9,7 +9,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
-using static FormulaEvaluator.Evaluator;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -498,12 +497,12 @@ namespace SS
             if (content is null) { throw new ArgumentNullException(); }
 
             if (name == "") { return SetCellContents(name, content); }
-
+            // If double number
             if (double.TryParse(content, out double number))
             {
                 return SetCellContents(name, number);
             }
-
+            // If formula
             if (content.StartsWith("="))
             {
                 //trim of the "="
