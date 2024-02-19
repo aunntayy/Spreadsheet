@@ -370,12 +370,14 @@ namespace SpreadsheetTests
         
         [TestMethod]
         [ExpectedException(typeof(SpreadsheetReadWriteException))]
-        // Save to non exist path
+        // Save to non-existent path
         public void SaveNonExist()
         {
-            AbstractSpreadsheet ss = new Spreadsheet("\text4", s => true, s =>s , "");
-            ss.Save("\text4");
+            AbstractSpreadsheet ss = new Spreadsheet();
+            Action saveAction = () => ss.Save("\\somethingIsNotRightWithMyTest\\save4.txt");
+            saveAction.Invoke();
         }
+
         [TestMethod]
         public void TestChangedProperty()
         {
