@@ -80,12 +80,12 @@ namespace SS
             }
 
             string savedVersion = GetSavedVersion(filepath);
-            
+
             if (!version.Equals(savedVersion))
             {
                 throw new SpreadsheetReadWriteException("Incorrect version: Expected " + version + ", but found " + savedVersion);
             }
-                LoadXml(filepath);
+            LoadXml(filepath);
         }
 
         private void LoadXml(string filepath)
