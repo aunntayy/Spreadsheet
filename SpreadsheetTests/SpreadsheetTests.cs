@@ -368,14 +368,14 @@ namespace SpreadsheetTests
         //    Assert.ThrowsException<SpreadsheetReadWriteException>(() => new Spreadsheet(filename, s => true, s => s, ""));
         //}
         //
-        //[TestMethod]
-        //[ExpectedException(typeof(SpreadsheetReadWriteException))]
-        //// Save to non exist path
-        //public void SaveNonExist()
-        //{
-        //    AbstractSpreadsheet ss = new Spreadsheet();
-        //    ss.Save("/save4.txt");
-        //}
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadWriteException))]
+        // Save to non exist path
+        public void SaveNonExist()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.Save("/save4.txt");
+        }
 
     }
 }
