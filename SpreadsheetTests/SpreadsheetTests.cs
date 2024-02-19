@@ -374,7 +374,7 @@ namespace SpreadsheetTests
         public void SaveNonExist()
         {
             AbstractSpreadsheet ss = new Spreadsheet();
-            ss.Save("\\save4.txt");
+            ss.Save("\\somethingIsNotRightWithMyTest\\save4.txt");
         }
 
     }
