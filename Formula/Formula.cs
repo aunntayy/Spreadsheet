@@ -274,7 +274,7 @@ namespace SpreadsheetUtilities
                         // Handle variables using the variableEvaluator delegate
                         variableValue = lookup(substring);
                     }
-                    catch (ArgumentException error)
+                    catch (ArgumentException)
                     {
                         return new FormulaError("Variable is not definded");
                     }
