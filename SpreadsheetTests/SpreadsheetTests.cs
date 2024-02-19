@@ -355,27 +355,27 @@ namespace SpreadsheetTests
             string version = ss.GetSavedVersion(filename);
         }
 
-        //[TestMethod]
-        //public void TestSaveFile()
-        //{
-        //    // Create a temporary XML file without the version attribute
-        //    string filename = "save4.txt";
-        //
-        //    // Create a new instance of your spreadsheet class
-        //    Spreadsheet ss = new Spreadsheet();
-        //
-        //    // Call the constructor with the temporary XML file, which should throw an exception
-        //    Assert.ThrowsException<SpreadsheetReadWriteException>(() => new Spreadsheet(filename, s => true, s => s, ""));
-        //}
-        //
-        //[TestMethod]
-        //[ExpectedException(typeof(SpreadsheetReadWriteException))]
-        //// Save to non exist path
-        //public void SaveNonExist()
-        //{
-        //    AbstractSpreadsheet ss = new Spreadsheet();
-        //    ss.Save("/save4.txt");
-        //}
+        [TestMethod]
+        public void TestSaveFile()
+        {
+            // Create a temporary XML file without the version attribute
+            string filename = "save4.txt";
+        
+            // Create a new instance of your spreadsheet class
+            Spreadsheet ss = new Spreadsheet();
+        
+            // Call the constructor with the temporary XML file, which should throw an exception
+            Assert.ThrowsException<SpreadsheetReadWriteException>(() => new Spreadsheet(filename, s => true, s => s, ""));
+        }
+        
+        [TestMethod]
+        [ExpectedException(typeof(SpreadsheetReadWriteException))]
+        // Save to non exist path
+        public void SaveNonExist()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            ss.Save("/save4.txt");
+        }
 
     }
 }
