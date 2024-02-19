@@ -373,9 +373,16 @@ namespace SpreadsheetTests
         // Save to non exist path
         public void SaveNonExist()
         {
-            AbstractSpreadsheet ss = new Spreadsheet();
-            ss.Save("\\somethingIsNotRightWithMyTest\\save4.txt");
+            AbstractSpreadsheet ss = new Spreadsheet("\text4", s => true, s =>s , "");
+            ss.Save("\text4");
         }
-
+        [TestMethod]
+        public void TestChangedProperty()
+        {
+            AbstractSpreadsheet ss = new Spreadsheet();
+            Assert.IsFalse(ss.Changed);
+            ss.SetContentsOfCell("A1", "123");
+            Assert.IsTrue(ss.Changed);
+        }
     }
 }
