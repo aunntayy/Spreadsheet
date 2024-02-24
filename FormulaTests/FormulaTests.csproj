@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\FormulaEvaluatorTester\FormulaEvaluatorTester.csproj" />
     <ProjectReference Include="..\Formula\Formula.csproj" />
   </ItemGroup>
 

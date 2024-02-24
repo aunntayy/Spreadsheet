@@ -9,7 +9,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FormulaEvaluatorTester", "F
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{FA09AB69-4107-47F7-998D-C2554D70419E}"
 	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Downloads\architecture.jpg = ..\..\..\..\Downloads\architecture.jpg
+		..\..\..\..\Downloads\dependency_graph_whiteboard.jpg = ..\..\..\..\Downloads\dependency_graph_whiteboard.jpg
+		..\..\..\..\Downloads\formula_whiteboard.jpg = ..\..\..\..\Downloads\formula_whiteboard.jpg
 		README.md = README.md
+		..\..\..\..\Downloads\spreadsheet_whiteboard.jpg = ..\..\..\..\Downloads\spreadsheet_whiteboard.jpg
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DenpencyGraphTest", "DependencyGraphTests\DenpencyGraphTest.csproj", "{6888D972-B0C0-4E52-925F-ABE2867AA27B}"
@@ -26,7 +30,16 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Spreadsheet", "Spreadsheet\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "SpreadsheetTests", "SpreadsheetTests\SpreadsheetTests.csproj", "{FFAB9824-D96B-4A11-9862-9A4DE4A83DCB}"
 EndProject
+
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "GUI", "GUI\GUI.csproj", "{02F04FA6-4A10-4D4C-8977-2B1C577B95C2}"
+=======
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Whiteboard", "Whiteboard", "{C32AAA17-C3FE-4A4A-BBFF-210E8775F27A}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\..\Downloads\dependency_graph_whiteboard.jpg = ..\..\..\..\Downloads\dependency_graph_whiteboard.jpg
+		..\..\..\..\Downloads\formula_whiteboard.jpg = ..\..\..\..\Downloads\formula_whiteboard.jpg
+		..\..\..\..\Downloads\spreadsheet_whiteboard.jpg = ..\..\..\..\Downloads\spreadsheet_whiteboard.jpg
+	EndProjectSection
+
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

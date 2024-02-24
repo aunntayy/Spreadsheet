@@ -9,7 +9,6 @@ using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using System.Xml;
-using static FormulaEvaluator.Evaluator;
 using static System.Net.Mime.MediaTypeNames;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
@@ -18,7 +17,7 @@ namespace SS
     /// <summary>
     /// Author:    Phuc Hoang
     /// Partner:   -None-
-    /// Date:      10-Feb-2024
+    /// Date:      14-Feb-2024
     /// Course:    CS 3500, University of Utah, School of Computing
     /// Copyright: CS 3500 and Phuc Hoang - This work may not 
     ///            be copied for use in Academic Coursework.
@@ -30,7 +29,7 @@ namespace SS
     ///
     /// File Contents
     ///
-    ///    [This file contains the implementation of a spreadsheet application 
+    ///    [This file contains the updated implementation of a spreadsheet application 
     ///    for CS 3500 course. It includes classes and methods related to managing
     ///    and manipulating spreadsheet data.]
     ///    
@@ -54,7 +53,7 @@ namespace SS
         }
 
         /// <summary>
-        /// Constructor set up for zero-argument constructor that creates an empty spreadsheet.
+        /// Constructor set up for zero-argument constructor 
         /// </summary>
         public Spreadsheet() : base(s => true, s => s, "default")
         {
@@ -63,6 +62,11 @@ namespace SS
             dg = new DependencyGraph();
             changed = false;
         }
+        /// <summary>
+        /// Constructor set up for zero-argument constructor 
+        /// <param name="isValid"></param>
+        /// <param name="Normalizer"></param>
+        /// <param name="version"></param>
         public Spreadsheet(Func<string, bool> isValid, Func<string, string> Normalizer, string version) : base(isValid, Normalizer, version)
         {
             cells = new Dictionary<string, Cell>();
@@ -70,65 +74,94 @@ namespace SS
             changed = false;
         }
 
-
+        /// <summary>
+        /// Constructor set up for zero-argument constructor 
+        /// </summary>
+        /// <param name="filepath"></param>
+        /// <param name="isValid"></param>
+        /// <param name="normalize"></param>
+        /// <param name="version"></param>
+        /// <exception cref="SpreadsheetReadWriteException"></exception>
         public Spreadsheet(string filepath, Func<string, bool> isValid, Func<string, string> normalize, string version)
-            : this(isValid, normalize, version)
+    : this(isValid, normalize, version)
         {
+            // Check if the file exists
             if (!File.Exists(filepath))
             {
                 throw new SpreadsheetReadWriteException("File not found: " + filepath);
             }
 
+            // Retrieve the saved version from the file
             string savedVersion = GetSavedVersion(filepath);
 
+            // Compare the saved version with the expected version
             if (!version.Equals(savedVersion))
             {
+                // Throw an exception if the saved version does not match the expected version
                 throw new SpreadsheetReadWriteException("Incorrect version: Expected " + version + ", but found " + savedVersion);
             }
+
+            // Load the spreadsheet data from the XML file
             LoadXml(filepath);
         }
 
+        // Method to load the spreadsheet data from an XML file
         private void LoadXml(string filepath)
         {
+            // Use XmlReader to read the XML file
             using (XmlReader reader = XmlReader.Create(filepath))
             {
+                // Read through the XML content
                 while (reader.Read())
                 {
+                    // Check if the current node is an element named "cell"
                     if (reader.NodeType == XmlNodeType.Element && reader.Name == "cell")
                     {
+                        // Load cell data from the XML
                         LoadCell(reader);
                     }
                 }
             }
         }
 
+
+        // Method to load cell data from the XML reader and set it in the spreadsheet
         private void LoadCell(XmlReader reader)
         {
+            // Initialize variables to store cell name and content
             string cellName = null;
             string cellContent = null;
 
+            // Read through the XML content
             while (reader.Read())
             {
+                // Check if the current node is an element
                 if (reader.NodeType == XmlNodeType.Element)
                 {
+                    // If the element name is "name", read the cell name content
                     if (reader.Name == "name")
                     {
                         cellName = reader.ReadElementContentAsString();
                     }
+                    // If the element name is "contents", read the cell content
                     else if (reader.Name == "contents")
                     {
                         cellContent = reader.ReadElementContentAsString();
                     }
                 }
 
+                // If both cell name and content are read
                 if (cellName != null && cellContent != null)
                 {
+                    // Set the contents of the cell in the spreadsheet
                     SetContentsOfCell(cellName, cellContent);
+                    // Reset cell name and content to null for the next iteration
                     cellName = null;
                     cellContent = null;
                 }
             }
         }
+
 
 
         internal class Cell
@@ -196,19 +229,19 @@ namespace SS
         /// </returns>
         public override object GetCellContents(string name)
         {
-            //If name is null and invalid then throw exception
+            // If name is null and invalid then throw exception
             if (name is null || !isValid(name))
             {
                 throw new InvalidNameException();
             }
-            //Make sure every cell return an empty string
+            // Make sure every cell return an empty string
             if (cells.TryGetValue(Normalize(name), out var cell))
             {
                 return cell.Content;
             }
             else
             {
-                //Get the contents
+                // Get the contents
                 return "";
             }
         }
@@ -247,13 +280,13 @@ namespace SS
         /// </returns>
         protected override IList<string> SetCellContents(string name, double number)
         {
-            //Update the cell with the given number
+            // Update the cell with the given number
             Cell cell = new Cell(number);
             cells[name] = cell;
             changed = true;
-            //Replace the dependents of 'name' in the dependency graph with an empty set
+            // Replace the dependents of 'name' in the dependency graph with an empty set
             dg.ReplaceDependees(name, new HashSet<string>());
-            //Get cells that need to be recalculated then add name
+            // Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
@@ -299,11 +332,11 @@ namespace SS
         /// </returns>
         protected override IList<string> SetCellContents(string name, string text)
         {
-            //Update the cell
+            // Update the cell
             Cell cell = new Cell(text);
             cells[name] = cell;
             changed = true;
-            //Get cells that need to be recalculated then add name
+            // Get cells that need to be recalculated then add name
             HashSet<string> dependentCells = new HashSet<string>(GetCellsToRecalculate(name))
                 {
                     name
@@ -412,7 +445,7 @@ namespace SS
         /// </returns>
         protected override IEnumerable<string> GetDirectDependents(string name)
         {
-            //Get the dependents by calling the GetDependents
+            // Get the dependents by calling the GetDependents
             return dg.GetDependents(name);
         }
 
@@ -498,12 +531,12 @@ namespace SS
             if (content is null) { throw new ArgumentNullException(); }
 
             if (name == "") { return SetCellContents(name, content); }
-
+            // If double number
             if (double.TryParse(content, out double number))
             {
                 return SetCellContents(name, number);
             }
-
+            // If formula
             if (content.StartsWith("="))
             {
                 //trim of the "="

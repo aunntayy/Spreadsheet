@@ -274,7 +274,7 @@ namespace SpreadsheetUtilities
                         // Handle variables using the variableEvaluator delegate
                         variableValue = lookup(substring);
                     }
-                    catch (ArgumentException error)
+                    catch (ArgumentException)
                     {
                         return new FormulaError("Variable is not definded");
                     }
@@ -454,7 +454,7 @@ namespace SpreadsheetUtilities
         /// new Formula("x1+y2").Equals(new Formula("y2+x1")) is false
         /// new Formula("2.0 + x7").Equals(new Formula("2.000 + x7")) is true
         /// </summary>
-        public override bool Equals(object? obj)
+        public override bool Equals(object obj)
         {
             //If obj is null or obj is not a Formula, returns false.
             if (obj == null || obj.GetType() != this.GetType())
