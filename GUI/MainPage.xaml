@@ -15,15 +15,17 @@
         <Border
             StrokeThickness="2"
             HeightRequest="40">
-            <ScrollView Orientation="Horizontal">
+           
             <HorizontalStackLayout >
                 <Label x:Name="selectedCell" Text="" WidthRequest="100"/>
             </HorizontalStackLayout>
-            </ScrollView>
+            
         </Border>
         
         <!-- the column headers: A, B, C, ... -->
-        <HorizontalStackLayout x:Name="TopLabels" BackgroundColor="PeachPuff"/>
+            <ScrollView Orientation="Horizontal">
+                <HorizontalStackLayout x:Name="TopLabels" BackgroundColor="PeachPuff"/>
+            </ScrollView>
 
         <!-- the Grid of Spreadsheet GUI Cells -->
         <ScrollView
@@ -34,7 +36,9 @@
                     HeightRequest="500">
             <HorizontalStackLayout>
                 <VerticalStackLayout x:Name="LeftLabels"  BackgroundColor="LightPink"></VerticalStackLayout>
-                <VerticalStackLayout x:Name="Grid"        BackgroundColor="LightGoldenrodYellow"></VerticalStackLayout>
+                <Grid x:Name="Grid" RowSpacing="25" ColumnSpacing="75" BackgroundColor="LightPink">
+                    <BoxView Grid.Row="0" Grid.Column="0" />
+                </Grid>
             </HorizontalStackLayout>
         </ScrollView>
     </VerticalStackLayout>
