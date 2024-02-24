@@ -2,7 +2,6 @@
 {
     public partial class MainPage : ContentPage
     {
-        int count = 0;
 
         public MainPage()
         {
@@ -73,23 +72,12 @@
                 }
                 );
             }
-            //Start for grid
-            for (int i = 0; i < 26; i++)
-            {
-                Grid.RowDefinitions.Add(new RowDefinition { Height = GridLength.Auto });
-            }
 
-            // Add columns
-            for (int j = 0; j < 99; j++)
+            //grid
+            for (int col = 1; col <= 26; col++)
             {
-                Grid.ColumnDefinitions.Add(new ColumnDefinition { Width = GridLength.Auto });
-            }
-
-            for (int row = 0; row < 26; row++)
-            {
-                for (int col = 0; col < 99; col++) 
+                for (int row = 1; row <= 99; row++)
                 {
-                    // Create a grid to hold the label and border
                     Grid gridCell = new Grid();
 
                     // Add a border
@@ -100,30 +88,35 @@
                     };
                     gridCell.Add(border);
 
-                    // Add a label
+                    // Add a entry
                     Label label = new Label
                     {
-                        BackgroundColor = Color.FromRgb(200, 200, 250),
+                        Text = $"{row}",
+                        BackgroundColor = Color.FromRgb(200, 200, 250),  
+                        HeightRequest = 20,
+                        WidthRequest = 75,
                         HorizontalTextAlignment = TextAlignment.Center
                     };
+                   
                     gridCell.Add(label);
 
                     // Add the grid containing the border and label to the main grid
-                    gridCell.Add(gridCell, col, row); // Add grid to column col and row row
+                    Grid.Add(gridCell, col, row); // Add grid to column col and row row
 
                 }
             }
-
         }
-        void FileMenuNew(object sender, EventArgs e)
-        {
-        }
+      
+            void FileMenuNew(object sender, EventArgs e)
+            {
+            }
 
-        void FileMenuOpenAsync(object sender, EventArgs e)
-        {
+            void FileMenuOpenAsync(object sender, EventArgs e)
+            {
 
-        }
+            }
+
+        
 
     }
-
 }

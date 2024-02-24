@@ -11,7 +11,7 @@
 
     <VerticalStackLayout x:Name="Entire">
 
-        <!-- A Place to put the currently selected cell "namd" and "value" -->
+            <!-- A Place to put the currently selected cell "namd" and "value" -->
         <Border
             StrokeThickness="2"
             HeightRequest="40">
@@ -27,7 +27,7 @@
                 <HorizontalStackLayout x:Name="TopLabels" BackgroundColor="PeachPuff"/>
             </ScrollView>
 
-        <!-- the Grid of Spreadsheet GUI Cells -->
+            <!-- the Grid of Spreadsheet GUI Cells -->
         <ScrollView
                     x:Name="Table"
                     Orientation="Both"
@@ -36,11 +36,12 @@
                     HeightRequest="500">
             <HorizontalStackLayout>
                 <VerticalStackLayout x:Name="LeftLabels"  BackgroundColor="LightPink"></VerticalStackLayout>
-                <Grid x:Name="Grid" RowSpacing="25" ColumnSpacing="75" BackgroundColor="LightPink">
+                <Grid x:Name="Grid"  BackgroundColor="LightPink">
                     <BoxView Grid.Row="0" Grid.Column="0" />
                 </Grid>
             </HorizontalStackLayout>
         </ScrollView>
+       
     </VerticalStackLayout>
 
 
