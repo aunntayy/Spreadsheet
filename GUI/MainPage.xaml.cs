@@ -95,6 +95,8 @@
                         BackgroundColor = Color.FromRgb(200, 200, 250),  
                         HeightRequest = 20,
                         WidthRequest = 75,
+                        HeightRequest = 20,
+                        WidthRequest = 75,
                         HorizontalTextAlignment = TextAlignment.Center
                     };
                    
