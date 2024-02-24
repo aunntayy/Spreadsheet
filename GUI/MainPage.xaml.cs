@@ -84,7 +84,10 @@
                     Border border = new Border
                     {
                         Stroke = Color.FromRgb(0, 0, 0),
-                        StrokeThickness = 1
+                        HeightRequest = 20,
+                        WidthRequest = 75,
+                        StrokeThickness = 1,
+                        HorizontalOptions = LayoutOptions.Start,
                     };
                     gridCell.Add(border);
 
@@ -92,12 +95,10 @@
                     Label label = new Label
                     {
                         Text = $"{row}",
-                        BackgroundColor = Color.FromRgb(200, 200, 250),  
-                        HeightRequest = 20,
-                        WidthRequest = 75,
+                        BackgroundColor = Color.FromRgb(200, 200, 250),
                         HorizontalTextAlignment = TextAlignment.Center
                     };
-                   
+
                     gridCell.Add(label);
 
                     // Add the grid containing the border and label to the main grid
@@ -106,37 +107,24 @@
                 }
             }
         }
-      
-            void FileMenuNew(object sender, EventArgs e)
-            {
-            }
 
-            void FileMenuOpenAsync(object sender, EventArgs e)
-            {
-
-            }
-
-        private void OnTableScrolled(object sender, ScrolledEventArgs e)
+        void FileMenuNew(object sender, EventArgs e)
         {
-            // Synchronize vertical scrolling of left labels
-            LeftLabels.TranslationY = -e.ScrollY;
-
-            // Synchronize horizontal scrolling of top labels
-            TopLabels.TranslationX = -e.ScrollX;
         }
 
-        private void OnLeftLabelsScrolled(object sender, ScrolledEventArgs e)
+        void FileMenuOpenAsync(object sender, EventArgs e)
         {
-            // Synchronize vertical scrolling of left labels
-            LeftLabels.TranslationY = -e.ScrollY;
-        }
 
+        }
+        // Make sure the top label work with horizontal scroll
         private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
         {
-            // Synchronize horizontal scrolling of top labels
             TopLabels.TranslationX = -e.ScrollX;
         }
-
-
+        // Make sure the Left label work with vertical scroll
+        private void OnLeftLabelsScrolled(object sender, ScrolledEventArgs e)
+        {
+            LeftLabels.TranslationY = -e.ScrollY;
+        }
     }
 }

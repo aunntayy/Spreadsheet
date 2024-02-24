@@ -15,17 +15,14 @@
         <Border
             StrokeThickness="2"
             HeightRequest="40">
-           
+
             <HorizontalStackLayout >
                 <Label x:Name="selectedCell" Text="" WidthRequest="100"/>
             </HorizontalStackLayout>
-            
         </Border>
         <StackLayout>
             <!-- Column headers -->
-            <HorizontalStackLayout x:Name="TopLabels" BackgroundColor="PeachPuff">
-               
-            </HorizontalStackLayout>
+            <HorizontalStackLayout x:Name="TopLabels" BackgroundColor="PeachPuff"></HorizontalStackLayout>
 
             <!-- The Grid of Spreadsheet GUI Cells -->
             <ScrollView
@@ -33,8 +30,7 @@
             Orientation="Both"
             HorizontalOptions="FillAndExpand"
             HorizontalScrollBarVisibility="Always"
-            HeightRequest="500"
-            Scrolled="OnTableScrolled">
+            HeightRequest="500">
                 <HorizontalStackLayout>
                     <ScrollView Orientation="Vertical"
                             VerticalOptions="FillAndExpand"
@@ -46,7 +42,7 @@
                             HorizontalOptions="FillAndExpand"
                             HorizontalScrollBarVisibility="Always"
                             Scrolled="OnTopLabelsScrolled">
-                            <Grid x:Name="Grid" BackgroundColor="LightPink"></Grid>
+                            <Grid x:Name="Grid" BackgroundColor="Lavender"></Grid>
                     </ScrollView>
                 </HorizontalStackLayout>
             </ScrollView>
