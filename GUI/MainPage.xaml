@@ -30,24 +30,21 @@
             Orientation="Both"
             HorizontalOptions="FillAndExpand"
             HorizontalScrollBarVisibility="Always"
-            HeightRequest="500">
+            HeightRequest="500"
+            Scrolled="OnTopLabelsScrolled">
                 <HorizontalStackLayout>
                     <ScrollView Orientation="Vertical"
                             VerticalOptions="FillAndExpand"
-                            VerticalScrollBarVisibility="Always"
-                            Scrolled="OnLeftLabelsScrolled">
-                            <VerticalStackLayout x:Name="LeftLabels" BackgroundColor="LightPink"></VerticalStackLayout>
+                            VerticalScrollBarVisibility="Always">
+                        <VerticalStackLayout x:Name="LeftLabels" BackgroundColor="LightPink"></VerticalStackLayout>
                     </ScrollView>
                     <ScrollView Orientation="Horizontal"
                             HorizontalOptions="FillAndExpand"
-                            HorizontalScrollBarVisibility="Always"
-                            Scrolled="OnTopLabelsScrolled">
-                            <Grid x:Name="Grid" BackgroundColor="Lavender"></Grid>
+                            HorizontalScrollBarVisibility="Always">
+                        <Grid x:Name="Grid" BackgroundColor="Lavender"></Grid>
                     </ScrollView>
                 </HorizontalStackLayout>
             </ScrollView>
         </StackLayout>
     </VerticalStackLayout>
-
-
 </ContentPage>
