@@ -95,8 +95,6 @@
                         BackgroundColor = Color.FromRgb(200, 200, 250),  
                         HeightRequest = 20,
                         WidthRequest = 75,
-                        HeightRequest = 20,
-                        WidthRequest = 75,
                         HorizontalTextAlignment = TextAlignment.Center
                     };
                    
@@ -118,7 +116,27 @@
 
             }
 
-        
+        private void OnTableScrolled(object sender, ScrolledEventArgs e)
+        {
+            // Synchronize vertical scrolling of left labels
+            LeftLabels.TranslationY = -e.ScrollY;
+
+            // Synchronize horizontal scrolling of top labels
+            TopLabels.TranslationX = -e.ScrollX;
+        }
+
+        private void OnLeftLabelsScrolled(object sender, ScrolledEventArgs e)
+        {
+            // Synchronize vertical scrolling of left labels
+            LeftLabels.TranslationY = -e.ScrollY;
+        }
+
+        private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
+        {
+            // Synchronize horizontal scrolling of top labels
+            TopLabels.TranslationX = -e.ScrollX;
+        }
+
 
     }
 }
