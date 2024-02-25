@@ -6,6 +6,12 @@
         public MainPage()
         {
             InitializeComponent();
+            createGrid();
+        }
+
+        private void createGrid()
+        {
+
             //Start of columns
             for (int i = 64; i <= 90; i++)
             {
@@ -95,10 +101,10 @@
                     Label label = new Label
                     {
                         Text = $"{row}",
-                        BackgroundColor = Color.FromRgb(200, 200, 250),  
+                        BackgroundColor = Color.FromRgb(200, 200, 250),
                         HorizontalTextAlignment = TextAlignment.Center
                     };
-                   
+
                     gridCell.Add(label);
 
                     // Add the grid containing the border and label to the main grid
@@ -107,16 +113,20 @@
                 }
             }
         }
-      
-            void FileMenuNew(object sender, EventArgs e)
+
+        void FileMenuNew(object sender, EventArgs e)
+        {
+       
+        }
+
+        void FileMenuOpenAsync(object sender, EventArgs e)
             {
+                
             }
-
-            void FileMenuOpenAsync(object sender, EventArgs e)
-            {
-
-            }
-
+        void Help(object sender, EventArgs e)
+        {
+           
+        }
         // Make sure everything is Synchronize
         private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
         {
