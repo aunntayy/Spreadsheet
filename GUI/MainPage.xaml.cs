@@ -1,8 +1,11 @@
-﻿namespace GUI
+﻿using Microsoft.UI.Xaml.Automation;
+using SS;
+
+namespace GUI
 {
     public partial class MainPage : ContentPage
     {
-
+        private Spreadsheet ss = new Spreadsheet();
         public MainPage()
         {
             InitializeComponent();
@@ -78,11 +81,11 @@
                 }
                 );
             }
-
+    
             //grid
-            for (int col = 1; col <= 26; col++)
+            for (int col = 1; col <= 6; col++)
             {
-                for (int row = 1; row <= 99; row++)
+                for (int row = 1; row <= 9; row++)
                 {
                     Grid gridCell = new Grid();
 
@@ -91,8 +94,7 @@
                     {
                         HeightRequest = 20,
                         WidthRequest = 75,
-                        Stroke = Color.FromRgb(0, 0, 0),
-                        
+                        Stroke = Color.FromRgb(0, 0, 0),                       
                         StrokeThickness = 1,
                         HorizontalOptions = LayoutOptions.Start,
                     };
@@ -101,18 +103,19 @@
                     // Add a entry
 
                     Entry label = new Entry
-                    {                    
-                        BackgroundColor = Color.FromRgb(200, 200, 250),  
+                    {
+                        BackgroundColor = Color.FromRgb(200, 200, 250),
                         HeightRequest = 20,
-                        WidthRequest = 75,                   
+                        WidthRequest = 75,
                         HorizontalTextAlignment = TextAlignment.Center
+                        
                     };
                     gridCell.Add(label);
-
+                    
 
                     // Add the grid containing the border and label to the main grid
                     Grid.Add(gridCell, col, row); // Add grid to column col and row row
-
+                   
                 }
             }
             
@@ -120,7 +123,7 @@
 
         void FileMenuNew(object sender, EventArgs e)
         {
-       
+            
         }
 
         void FileMenuOpenAsync(object sender, EventArgs e)
@@ -133,9 +136,36 @@
         }
 
         private async void Save(object sender, EventArgs e)
-        {
-            
-            
+        { // Ask user for filename
+            string filename = await DisplayPromptAsync("Enter file name", "Please enter the file name:");
+
+            if (!string.IsNullOrEmpty(filename))
+            {
+                try
+                {
+                    // Get the directory where the application is running
+                    string baseDirectory = AppDomain.CurrentDomain.BaseDirectory;
+
+                    // Combine the base directory with a subdirectory (if needed)
+                    string targetDirectory = Path.Combine(baseDirectory, "SavedFiles");
+
+                    // Ensure the directory exists, create it if it doesn't
+                    Directory.CreateDirectory(targetDirectory);
+
+                    // Combine the directory path with the filename
+                    string filePath = Path.Combine(targetDirectory, filename);
+
+                    // Save the file
+                    ss?.Save(filePath);
+
+                    await DisplayAlert("Success", "File saved successfully", "OK");
+                }
+                catch (Exception ex)
+                {
+                    await DisplayAlert("Error", $"Failed to save file: {ex.Message}", "OK");
+                }
+            }
+
         }
 
         // Make sure everything is Synchronize
