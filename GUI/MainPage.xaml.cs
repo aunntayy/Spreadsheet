@@ -92,8 +92,7 @@
                         HeightRequest = 20,
                         WidthRequest = 75,
                         Stroke = Color.FromRgb(0, 0, 0),
-                        HeightRequest = 20,
-                        WidthRequest = 75,
+                        
                         StrokeThickness = 1,
                         HorizontalOptions = LayoutOptions.Start,
                     };
@@ -111,8 +110,8 @@
                         HorizontalTextAlignment = TextAlignment.Center
 
                     };
+                    gridCell.Add(label);
 
-                    gridCell.Add(input);
 
                     // Add the grid containing the border and label to the main grid
                     Grid.Add(gridCell, col, row); // Add grid to column col and row row
