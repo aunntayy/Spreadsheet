@@ -59,7 +59,7 @@
                 {
                     Stroke = Color.FromRgb(0, 0, 0),
                     StrokeThickness = 1,
-                    HeightRequest = 20,
+                    HeightRequest = 44,
                     WidthRequest = 75,
                     HorizontalOptions = LayoutOptions.Start,
                     Content =
@@ -74,7 +74,7 @@
             }
 
             //grid
-            for (int col = 1; col <= 26; col++)
+            for (int col = 1; col <= 24; col++)
             {
                 for (int row = 1; row <= 99; row++)
                 {
@@ -83,20 +83,21 @@
                     // Add a border
                     Border border = new Border
                     {
+                        HeightRequest = 20,
+                        WidthRequest = 75,
                         Stroke = Color.FromRgb(0, 0, 0),
                         StrokeThickness = 1
                     };
                     gridCell.Add(border);
 
                     // Add a entry
-                    Label label = new Label
+                    Entry label = new Entry
                     {
-                        Text = $"{row}",
+                     
                         BackgroundColor = Color.FromRgb(200, 200, 250),  
                         HeightRequest = 20,
                         WidthRequest = 75,
-                        HeightRequest = 20,
-                        WidthRequest = 75,
+                       
                         HorizontalTextAlignment = TextAlignment.Center
                     };
                    
@@ -107,6 +108,7 @@
 
                 }
             }
+            
         }
       
             void FileMenuNew(object sender, EventArgs e)

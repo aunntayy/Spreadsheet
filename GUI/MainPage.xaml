@@ -34,10 +34,12 @@
                     HorizontalOptions="FillAndExpand"
                     HorizontalScrollBarVisibility="Always"
                     HeightRequest="500">
-            <HorizontalStackLayout>
+            <HorizontalStackLayout Padding=" 0">
                 <VerticalStackLayout x:Name="LeftLabels"  BackgroundColor="LightPink"></VerticalStackLayout>
-                <Grid x:Name="Grid"  BackgroundColor="LightPink">
-                    <BoxView Grid.Row="0" Grid.Column="0" />
+
+                <Grid x:Name="Grid"  BackgroundColor="Lavender">
+                    
+                  
                 </Grid>
             </HorizontalStackLayout>
         </ScrollView>
