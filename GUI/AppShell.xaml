@@ -11,5 +11,4 @@
         Title="Spread Sheet"
         ContentTemplate="{DataTemplate local:MainPage}"
         Route="MainPage" />
-
 </Shell>

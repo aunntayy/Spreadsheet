@@ -6,45 +6,46 @@
         <MenuBarItem Text="File">
             <MenuFlyoutItem Text="New" Clicked="FileMenuNew" />
             <MenuFlyoutItem Text="Open" Clicked="FileMenuOpenAsync" />
+            <MenuFlyoutItem Text="Help?" Clicked="Help" />
         </MenuBarItem>
     </ContentPage.MenuBarItems>
 
     <VerticalStackLayout x:Name="Entire">
 
-            <!-- A Place to put the currently selected cell "namd" and "value" -->
+        <!-- A Place to put the currently selected cell "namd" and "value" -->
         <Border
             StrokeThickness="2"
             HeightRequest="40">
-           
+
             <HorizontalStackLayout >
                 <Label x:Name="selectedCell" Text="" WidthRequest="100"/>
             </HorizontalStackLayout>
-            
         </Border>
-        
-        <!-- the column headers: A, B, C, ... -->
-            <ScrollView Orientation="Horizontal">
-                <HorizontalStackLayout x:Name="TopLabels" BackgroundColor="PeachPuff"/>
+        <StackLayout>
+            <!-- Column headers -->
+            <HorizontalStackLayout x:Name="TopLabels" BackgroundColor="PeachPuff"></HorizontalStackLayout>
+
+            <!-- The Grid of Spreadsheet GUI Cells -->
+            <ScrollView
+            x:Name="Table"
+            Orientation="Both"
+            HorizontalOptions="FillAndExpand"
+            HorizontalScrollBarVisibility="Always"
+            HeightRequest="500"
+            Scrolled="OnTopLabelsScrolled">
+                <HorizontalStackLayout>
+                    <ScrollView Orientation="Vertical"
+                            VerticalOptions="FillAndExpand"
+                            VerticalScrollBarVisibility="Always">
+                        <VerticalStackLayout x:Name="LeftLabels" BackgroundColor="LightPink"></VerticalStackLayout>
+                    </ScrollView>
+                    <ScrollView Orientation="Horizontal"
+                            HorizontalOptions="FillAndExpand"
+                            HorizontalScrollBarVisibility="Always">
+                        <Grid x:Name="Grid" BackgroundColor="Lavender"></Grid>
+                    </ScrollView>
+                </HorizontalStackLayout>
             </ScrollView>
-
-            <!-- the Grid of Spreadsheet GUI Cells -->
-        <ScrollView
-                    x:Name="Table"
-                    Orientation="Both"
-                    HorizontalOptions="FillAndExpand"
-                    HorizontalScrollBarVisibility="Always"
-                    HeightRequest="500">
-            <HorizontalStackLayout Padding=" 0">
-                <VerticalStackLayout x:Name="LeftLabels"  BackgroundColor="LightPink"></VerticalStackLayout>
-
-                <Grid x:Name="Grid"  BackgroundColor="Lavender">
-                    
-                  
-                </Grid>
-            </HorizontalStackLayout>
-        </ScrollView>
-       
+        </StackLayout>
     </VerticalStackLayout>
-
-
 </ContentPage>

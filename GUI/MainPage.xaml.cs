@@ -6,6 +6,12 @@
         public MainPage()
         {
             InitializeComponent();
+            createGrid();
+        }
+
+        private void createGrid()
+        {
+
             //Start of columns
             for (int i = 64; i <= 90; i++)
             {
@@ -86,11 +92,15 @@
                         HeightRequest = 20,
                         WidthRequest = 75,
                         Stroke = Color.FromRgb(0, 0, 0),
-                        StrokeThickness = 1
+                        HeightRequest = 20,
+                        WidthRequest = 75,
+                        StrokeThickness = 1,
+                        HorizontalOptions = LayoutOptions.Start,
                     };
                     gridCell.Add(border);
 
                     // Add a entry
+
                     Entry label = new Entry
                     {
                      
@@ -99,9 +109,10 @@
                         WidthRequest = 75,
                        
                         HorizontalTextAlignment = TextAlignment.Center
+
                     };
-                   
-                    gridCell.Add(label);
+
+                    gridCell.Add(input);
 
                     // Add the grid containing the border and label to the main grid
                     Grid.Add(gridCell, col, row); // Add grid to column col and row row
@@ -110,17 +121,24 @@
             }
             
         }
-      
-            void FileMenuNew(object sender, EventArgs e)
-            {
-            }
 
-            void FileMenuOpenAsync(object sender, EventArgs e)
-            {
+        void FileMenuNew(object sender, EventArgs e)
+        {
+       
+        }
 
-            }
-
-        
-
+        void FileMenuOpenAsync(object sender, EventArgs e)
+        {
+            
+        }
+        void Help(object sender, EventArgs e)
+        {
+           
+        }
+        // Make sure everything is Synchronize
+        private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
+        {
+            TopLabels.TranslationX = -e.ScrollX;
+        }
     }
 }
