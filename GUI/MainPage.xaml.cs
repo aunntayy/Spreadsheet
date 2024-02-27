@@ -80,7 +80,7 @@
             }
 
             //grid
-            for (int col = 1; col <= 24; col++)
+            for (int col = 1; col <= 26; col++)
             {
                 for (int row = 1; row <= 99; row++)
                 {
@@ -101,14 +101,11 @@
                     // Add a entry
 
                     Entry label = new Entry
-                    {
-                     
+                    {                    
                         BackgroundColor = Color.FromRgb(200, 200, 250),  
                         HeightRequest = 20,
-                        WidthRequest = 75,
-                       
+                        WidthRequest = 75,                   
                         HorizontalTextAlignment = TextAlignment.Center
-
                     };
                     gridCell.Add(label);
 
@@ -130,10 +127,17 @@
         {
             
         }
-        void Help(object sender, EventArgs e)
+        void  Help(object sender, EventArgs e)
         {
            
         }
+
+        private async void Save(object sender, EventArgs e)
+        {
+            
+            
+        }
+
         // Make sure everything is Synchronize
         private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
         {

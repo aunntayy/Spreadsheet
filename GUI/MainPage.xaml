@@ -6,6 +6,7 @@
         <MenuBarItem Text="File">
             <MenuFlyoutItem Text="New" Clicked="FileMenuNew" />
             <MenuFlyoutItem Text="Open" Clicked="FileMenuOpenAsync" />
+            <MenuFlyoutItem Text="Save" Clicked="Save" />
             <MenuFlyoutItem Text="Help?" Clicked="Help" />
         </MenuBarItem>
     </ContentPage.MenuBarItems>
@@ -46,6 +47,9 @@
                     </ScrollView>
                 </HorizontalStackLayout>
             </ScrollView>
+          
         </StackLayout>
     </VerticalStackLayout>
+
+ 
 </ContentPage>
