@@ -98,14 +98,12 @@
                     gridCell.Add(border);
 
                     // Add a entry
-                    Label label = new Label
+                    Entry input = new Entry();
                     {
-                        Text = $"{row}",
-                        BackgroundColor = Color.FromRgb(200, 200, 250),
-                        HorizontalTextAlignment = TextAlignment.Center
+                        BackgroundColor = Color.FromRgb(200, 200, 250);
                     };
 
-                    gridCell.Add(label);
+                    gridCell.Add(input);
 
                     // Add the grid containing the border and label to the main grid
                     Grid.Add(gridCell, col, row); // Add grid to column col and row row
@@ -120,9 +118,9 @@
         }
 
         void FileMenuOpenAsync(object sender, EventArgs e)
-            {
-                
-            }
+        {
+            
+        }
         void Help(object sender, EventArgs e)
         {
            
