@@ -5,7 +5,13 @@ namespace GUI
 {
     public partial class MainPage : ContentPage
     {
+     
         private Spreadsheet ss = new Spreadsheet();
+        private MyEntry[,] EntryColumn = new MyEntry[99,26];
+        List<HorizontalStackLayout> Rows = new List<HorizontalStackLayout>();
+
+        private readonly int col = 99;
+        private readonly int row = 26;
         public MainPage()
         {
             InitializeComponent();
@@ -68,7 +74,7 @@ namespace GUI
                 {
                     Stroke = Color.FromRgb(0, 0, 0),
                     StrokeThickness = 1,
-                    HeightRequest = 44,
+                    HeightRequest = 32,
                     WidthRequest = 75,
                     HorizontalOptions = LayoutOptions.Start,
                     Content =
@@ -81,44 +87,20 @@ namespace GUI
                 }
                 );
             }
-    
+
+
             //grid
-            for (int col = 1; col <= 6; col++)
-            {
-                for (int row = 1; row <= 9; row++)
-                {
-                    Grid gridCell = new Grid();
+            for (int i = 0; i < col; i++) {
+                HorizontalStackLayout verRow = new HorizontalStackLayout(); // Create a new HorizontalStackLayout for each row
+                Rows.Add(verRow); // Add the row to the list
 
-                    // Add a border
-                    Border border = new Border
-                    {
-                        HeightRequest = 20,
-                        WidthRequest = 75,
-                        Stroke = Color.FromRgb(0, 0, 0),                       
-                        StrokeThickness = 1,
-                        HorizontalOptions = LayoutOptions.Start,
-                    };
-                    gridCell.Add(border);
-
-                    // Add a entry
-
-                    Entry label = new Entry
-                    {
-                        BackgroundColor = Color.FromRgb(200, 200, 250),
-                        HeightRequest = 20,
-                        WidthRequest = 75,
-                        HorizontalTextAlignment = TextAlignment.Center
-                        
-                    };
-                    gridCell.Add(label);
-                    
-
-                    // Add the grid containing the border and label to the main grid
-                    Grid.Add(gridCell, col, row); // Add grid to column col and row row
-                   
+                for (int j = 0; j < row; j++) {
+                    EntryColumn[i, j] = new MyEntry(i, j); // Adjusting indices to start from 0
+                    verRow.Add(EntryColumn[i, j]); // Add each MyEntry to the row
                 }
+
+                bar.Add(verRow); // Add the row to the vertical layout
             }
-            
         }
 
         void FileMenuNew(object sender, EventArgs e)

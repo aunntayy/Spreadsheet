@@ -25,7 +25,7 @@
         <StackLayout>
             <!-- Column headers -->
             <HorizontalStackLayout x:Name="TopLabels" BackgroundColor="PeachPuff"></HorizontalStackLayout>
-
+       
             <!-- The Grid of Spreadsheet GUI Cells -->
             <ScrollView
             x:Name="Table"
@@ -40,16 +40,21 @@
                             VerticalScrollBarVisibility="Always">
                         <VerticalStackLayout x:Name="LeftLabels" BackgroundColor="LightPink"></VerticalStackLayout>
                     </ScrollView>
-                    <ScrollView Orientation="Horizontal"
+                    <!--<ScrollView Orientation="Horizontal"
                             HorizontalOptions="FillAndExpand"
                             HorizontalScrollBarVisibility="Always">
                         <Grid x:Name="Grid" BackgroundColor="Lavender"></Grid>
-                    </ScrollView>
+                    </ScrollView>-->
+                    <VerticalStackLayout x:Name="bar" HorizontalOptions="Center">
+                      
+                    </VerticalStackLayout>
                 </HorizontalStackLayout>
+              
             </ScrollView>
+
           
         </StackLayout>
     </VerticalStackLayout>
 
- 
+
 </ContentPage>
