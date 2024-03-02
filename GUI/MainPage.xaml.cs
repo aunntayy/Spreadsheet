@@ -135,7 +135,6 @@ namespace GUI
             {
                 await DisplayAlert("Error", $"Failed to open file: {ex.Message}", "OK");
             }
-
         }
         private void ClearGrid()
         {
@@ -147,12 +146,15 @@ namespace GUI
                 }
             }
         }
-            void Help(object sender, EventArgs e)
-            {
+        void Help(object sender, EventArgs e)
+        {
 
-            }
-
-            private async void Save(object sender, EventArgs e)
+        }
+        // Function for saving the sheet
+        private async void Save(object sender, EventArgs e)
+        {
+            // Check for any changed
+            if (ss.Changed)
             {
                 try
                 {
@@ -199,23 +201,26 @@ namespace GUI
                     await DisplayAlert("Error", $"Failed to save file: {ex.Message}", "OK");
                 }
             }
+            // Prompt the user for unchange so no save
+            else { await DisplayAlert("No change have been make", $"Failed to save file", "OK"); }
+        }
 
 
 
 
-            // Make sure everything is Synchronize
-            private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
-            {
-                TopLabels.TranslationX = -e.ScrollX;
-            }
+        // Make sure everything is Synchronize
+        private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
+        {
+            TopLabels.TranslationX = -e.ScrollX;
+        }
 
 
-            private void OnPageLoaded(object sender, EventArgs e)
-            {
-                // set the focus to the widget (e.g., entry) that you want   
-                EntryColumn[0, 0].Focus();
-
-            }
+        private void OnPageLoaded(object sender, EventArgs e)
+        {
+            // set the focus to the widget (e.g., entry) that you want   
+            EntryColumn[0, 0].Focus();
 
         }
+
     }
+}

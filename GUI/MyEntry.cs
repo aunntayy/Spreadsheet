@@ -52,9 +52,7 @@ namespace GUI
 
         private string GetCellName()
         {
-
             string colChar = ((char)('A' + col)).ToString();
-
             string rowChar = row.ToString();
             string cell = colChar + rowChar;
             return cell;
