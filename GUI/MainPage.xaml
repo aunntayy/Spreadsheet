@@ -19,7 +19,8 @@
             HeightRequest="40">
 
             <HorizontalStackLayout >
-                <Label x:Name="selectedCell" Text="" WidthRequest="100"/>
+                <Label x:Name="selectedCell" Text="" WidthRequest="100" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
+                <Entry x:Name="showContent" Text="" WidthRequest="1000" VerticalTextAlignment="Center" HorizontalTextAlignment="Center"/>
             </HorizontalStackLayout>
         </Border>
         <StackLayout>

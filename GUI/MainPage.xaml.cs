@@ -1,167 +1,192 @@
 ﻿using SS;
 
+namespace GUI {
+    public partial class MainPage : ContentPage {
+        // Initialize needed variables
 
-namespace GUI
-{
-    public partial class MainPage : ContentPage
-    {
-        // Initialize needed var
-        private Dictionary<string, Entry> Cell;
+        // Spreadsheet instance
         private Spreadsheet ss = new Spreadsheet(s => true, s => s.ToUpper(), "six");
-        private List<HorizontalStackLayout> Rows = new List<HorizontalStackLayout>();
-        private string currentFilePath = ""; // Variable to store the current file path
-        // If the spread sheet size need to be change
+        // List to store rows
+        private readonly List<HorizontalStackLayout> Rows = new List<HorizontalStackLayout>();
+        // Variable to store the current file path
+        private string currentFilePath = "";
+        // Entry column for the spreadsheet
         private MyEntry[,] EntryColumn = new MyEntry[10, 10];
-        private int col = 10;
-        private int row = 10;
-        public MainPage()
-        {
-            Cell = new Dictionary<string, Entry>();
+        private readonly int col = 10;
+        private readonly int row = 10;
+
+        /// <summary>
+        /// Initializes a new instance of the MainPage class.
+        /// </summary>
+        public MainPage() {
             InitializeComponent();
-            createGrid();
+            CreateGrid();
+            Focused += (sender, e) => {
+                ShowSelectedCell();
+                ShowContent();
+            };
+
+            showContent.Completed += ChangeContent;
         }
 
         /// <summary>
-        /// Create the grid 
+        /// Handles the completion of the content change animation.
         /// </summary>
-        private void createGrid()
-        {
+        /// <param name="e">ignore</param>
+        /// <param name="sender">ignore</param>
+        private void ChangeContent(object? sender, EventArgs e) {
+            foreach (var entry in EntryColumn) {
+                if (selectedCell.Text.Equals(entry.GetCellName())) {
+                    entry.Text = showContent.Text;
+                    entry.CellUpdated();
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the content shown based on the focused cell.
+        /// </summary>
+        private void ShowContent() {
+            foreach (var entry in EntryColumn) {
+                if (entry.IsFocused) {
+                    showContent.Text = entry.Text;
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Updates the selected cell indicator based on the focused cell.
+        /// </summary>
+        private void ShowSelectedCell() {
+            foreach (var entry in EntryColumn) {
+                if (entry.IsFocused) {
+                    selectedCell.Text = entry.GetCellName();
+                    break;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates the grid layout for the spreadsheet.
+        /// </summary>
+        private void CreateGrid() {
             EntryColumn = new MyEntry[col, row];
-            //Start of columns
-            for (int i = 0; i <= col; i++)
-            {
+            // Start of columns
+            for (int i = 0; i <= col; i++) {
                 var label = i == 0 ? "" : ((char)('A' + i - 1)).ToString();
                 TopLabels.Add(
-                new Border
-                {
-                    Stroke = Color.FromRgb(0, 0, 0),
-                    StrokeThickness = 1,
-                    HeightRequest = 20,
-                    WidthRequest = 75,
-                    HorizontalOptions = LayoutOptions.Center,
-                    Content =
-                        new Label
-                        {
-                            Text = $"{label}",
-                            BackgroundColor = Color.FromRgb(200, 200, 250),
-                            HorizontalTextAlignment = TextAlignment.Center
-                        }
-                }
+                    new Border {
+                        Stroke = Color.FromRgb(0, 0, 0),
+                        StrokeThickness = 1,
+                        HeightRequest = 20,
+                        WidthRequest = 75,
+                        HorizontalOptions = LayoutOptions.Center,
+                        Content =
+                            new Label {
+                                Text = $"{label}",
+                                BackgroundColor = Color.FromRgb(200, 200, 250),
+                                HorizontalTextAlignment = TextAlignment.Center
+                            }
+                    }
                 );
             }
-            //Start of rows
-            for (int i = 1; i <= row; i++)
-            {
-
+            // Start of rows
+            for (int i = 1; i <= row; i++) {
                 LeftLabels.Add(
-                new Border
-                {
-                    Stroke = Color.FromRgb(0, 0, 0),
-                    StrokeThickness = 1,
-                    HeightRequest = 32,//32
-                    WidthRequest = 75,
-                    HorizontalOptions = LayoutOptions.Start,
-                    Content =
-                        new Label
-                        {
-                            Text = $"{i}",
-                            BackgroundColor = Color.FromRgb(200, 200, 250),
-                            HorizontalTextAlignment = TextAlignment.Center
-                        }
-                }
+                    new Border {
+                        Stroke = Color.FromRgb(0, 0, 0),
+                        StrokeThickness = 1,
+                        HeightRequest = 32,//32
+                        WidthRequest = 75,
+                        HorizontalOptions = LayoutOptions.Start,
+                        Content =
+                            new Label {
+                                Text = $"{i}",
+                                BackgroundColor = Color.FromRgb(200, 200, 250),
+                                HorizontalTextAlignment = TextAlignment.Center
+                            }
+                    }
                 );
             }
 
-
-            //grid
-            for (int i = 0; i < col; i++)
-            {
+            // grid
+            for (int i = 0; i < col; i++) {
                 HorizontalStackLayout verRow = new HorizontalStackLayout(); // Create a new HorizontalStackLayout for each row
                 Rows.Add(verRow); // Add the row to the list
-                for (int j = 0; j < row; j++)
-                {
-
+                for (int j = 0; j < row; j++) {
                     EntryColumn[i, j] = new MyEntry(ss, i, j); // Adjusting indices to start from 0
                     verRow.Add(EntryColumn[i, j]); // Add each MyEntry to the row
                 }
                 bar.Add(verRow); // Add the row to the vertical layout
             }
         }
+
         /// <summary>
-        /// Function for button new
+        /// Clears the content of the grid.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        private async void FileMenuNew(object sender, EventArgs e)
-        {
+        private void ClearGrid() {
+            for (int i = 0; i <= col; i++) {
+                for (int j = 0; j <= row; j++) {
+                    EntryColumn[i, j].Text = ""; // Clear cell content
+                }
+            }
+        }
+
+        /// <summary>
+        /// Creates a new spreadsheet.
+        /// </summary>
+        /// <param name="sender">ignore</param>
+        /// <param name="e">ignore</param>
+        private async void FileMenuNew(object sender, EventArgs e) {
             // Check for saving changes
             bool saveChange = false;
             Spreadsheet currentSpread = ss;
-            if (ss.Changed)
-            {
-                // prompt the user if they want to save
-                saveChange = await DisplayAlert("Unsaved change", "Do you want to save the changed before open new file ?", "yes", "Cancel");
-                if (saveChange)
-                {
+            if (ss.Changed) {
+                // Prompt the user if they want to save
+                saveChange = await DisplayAlert("Unsaved change", "Do you want to save the changes before opening a new file?", "Yes", "Cancel");
+                if (saveChange) {
                     // Restore the original spreadsheet if changes are not saved
                     ss = currentSpread;
                     return;
                 }
             }
             // If no save
-            if (!ss.Changed || !saveChange)
-            {
+            if (!ss.Changed || !saveChange) {
                 ClearGrid();
                 ss = new Spreadsheet();
             }
         }
 
         /// <summary>
-        /// Helper funtion to clear up the grid
+        /// Opens a spreadsheet file.
         /// </summary>
-        private void ClearGrid()
-        {
-            for (int i = 0; i < col; i++)
-            {
-                for (int j = 0; j < row; j++)
-                {
-                    EntryColumn[i, j].Text = ""; // Clear cell content
-                }
-            }
-        }
-        
-
-        // Function for button Open
-        private async void FileMenuOpenAsync(object sender, EventArgs e)
-        {
+        /// <param name="e">ignore</param>
+        /// <param name="sender">ignore</param>
+        private async void FileMenuOpenAsync(object sender, EventArgs e) {
             Spreadsheet currentSpread = ss;
-            // Check to know if the user wants to save their current spreadsheet
-            if (ss.Changed)
-            {
-                bool saveChange = await DisplayAlert("Unsaved change", "Do you want to save the changed before open new file ?", "yes", "Cancel");
-                if (saveChange)
-                {
+            // Check if the user wants to save their current spreadsheet
+            if (ss.Changed) {
+                bool saveChange = await DisplayAlert("Unsaved change", "Do you want to save the changes before opening a new file?", "Yes", "Cancel");
+                if (saveChange) {
                     // Restore the original spreadsheet if changes are not saved
                     ss = currentSpread;
                     return;
                 }
             }
 
-            try
-            {
+            try {
                 // Use FilePicker to select a file
-                var fileResult = await FilePicker.PickAsync(new PickOptions
-                {
+                var fileResult = await FilePicker.PickAsync(new PickOptions {
                     PickerTitle = "Select a file"
                 });
 
-                if (fileResult != null)
-                {
+                if (fileResult != null) {
                     string selectedFilePath = fileResult.FullPath;
                     string extension = Path.GetExtension(selectedFilePath);
                     // Check for the right extension
-                    if (extension != ".sprd")
-                    {
+                    if (extension != ".sprd") {
                         await DisplayAlert("Invalid extension", extension, "OK");
                         return;
                     }
@@ -171,114 +196,103 @@ namespace GUI
                     currentFilePath = selectedFilePath; // Update the current file path
                     ss = new Spreadsheet(selectedFilePath, s => true, s => s, "six");
                     // Populate the new open spreadsheet with the open file content
-                    foreach (string cell in ss.GetNamesOfAllNonemptyCells())
-                    {
+                    foreach (string cell in ss.GetNamesOfAllNonemptyCells()) {
                         // Extract row and column indices from the cell name
                         string cellName = cell.ToUpper(); // Ensure the cell name is in upper case
                         int colIndex = cellName[0] - 'A'; // Convert the first character to column index
                         int rowIndex = int.Parse(cellName.Substring(1)) - 1; // Extract the numeric part and convert it to row index
 
                         // Check if the indices are within the valid range
-                        if (colIndex >= 0 && colIndex < col && rowIndex >= 0 && rowIndex < row)
-                        {
+                        if (colIndex >= 0 && colIndex < col && rowIndex >= 0 && rowIndex < row) {
                             string cellValue = ss.GetCellValue(cell).ToString(); // Retrieve cell value from spreadsheet
                             EntryColumn[rowIndex, colIndex].Text = cellValue; // Update the corresponding MyEntry value
                         }
                     }
-                }
-                else
-                {
+                } else {
                     // If no file was selected
                     await DisplayAlert("Error", "No file selected", "OK");
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 // If any errors occur
                 await DisplayAlert("Error", $"Failed to open file: {ex.Message}", "OK");
             }
         }
 
-        // Function to save changes
-        private async Task SaveChanges()
-        {
-            try
-            {
+        /// <summary>
+        /// Saves the changes made to the spreadsheet.
+        /// </summary>
+        private async Task SaveChanges() {
+            try {
                 // If the current file path is not empty, save the changes directly
-                if (!string.IsNullOrEmpty(currentFilePath))
-                {
+                if (!string.IsNullOrEmpty(currentFilePath)) {
                     ss?.Save(currentFilePath);
                     await DisplayAlert("Success", $"File saved successfully at: {currentFilePath}", "OK");
-                }
-                else
-                {
-                        // If the current file path is empty, prompt the user to enter a new file path
-                        string filename = await DisplayPromptAsync("Enter file name", "Please enter the file name:");
-                        if (string.IsNullOrEmpty(filename))
-                        {
-                            return;
-                        }
-                        filename = filename + ".sprd";
-                        string filepath = await DisplayPromptAsync("Enter file path", "Please enter the file path:");
-                        if (string.IsNullOrEmpty(filepath))
-                        {
-                            return;
-                        }
-                        if (string.IsNullOrEmpty(filepath))
-                        {
-                            filepath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                        }
+                } else {
+                    // If the current file path is empty, prompt the user to enter a new file path
+                    string filename = await DisplayPromptAsync("Enter file name", "Please enter the file name:");
+                    if (string.IsNullOrEmpty(filename)) {
+                        return;
+                    }
+                    filename = filename + ".sprd";
+                    string filepath = await DisplayPromptAsync("Enter file path", "Please enter the file path:");
+                    if (string.IsNullOrEmpty(filepath)) {
+                        return;
+                    }
+                    if (string.IsNullOrEmpty(filepath)) {
+                        filepath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                    }
 
-                        string filePath = Path.Combine(filepath, filename);
+                    string filePath = Path.Combine(filepath, filename);
 
-                        ss?.Save(filePath);
-                        await DisplayAlert("Success", $"File saved successfully at: {filePath}", "OK");
-                        currentFilePath = filePath; // Update the current file path
+                    ss?.Save(filePath);
+                    await DisplayAlert("Success", $"File saved successfully at: {filePath}", "OK");
+                    currentFilePath = filePath; // Update the current file path
                 }
-            }
-            catch (Exception ex)
-            {
+            } catch (Exception ex) {
                 await DisplayAlert("Error", $"Failed to save file: {ex.Message}", "OK");
             }
         }
 
-        // Function for the Save button
-        private async void Save(object sender, EventArgs e)
-        {
-            if (ss.Changed)
-            {
+        /// <summary>
+        /// Saves the changes made to the spreadsheet when the Save button is clicked.
+        /// </summary>
+        /// <param name="sender">ignore</param>
+        /// <param name="e">ignore</param>
+        private async void Save(object sender, EventArgs e) {
+            if (ss.Changed) {
                 await SaveChanges();
-            }
-            else
-            {
+            } else {
                 await DisplayAlert("No changes", "No changes have been made since the file was opened.", "OK");
             }
         }
 
         /// <summary>
-        /// Function for the Help button
+        /// Navigates to the help page.
         /// </summary>
-        /// <param name="sender"></param>
-        /// <param name="e"></param>
-        void Help(object sender, EventArgs e)
-        {
+        /// <param name="sender">ignore</param>
+        /// <param name="e">ignore</param>
+        void Help(object sender, EventArgs e) {
             HelpPage help = new HelpPage();
             Navigation.PushAsync(help, true);
         }
 
-        // Make sure everything is Synchronize
-        private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
-        {
+        /// <summary>
+        /// Handles the horizontal scrolling of top labels.
+        /// </summary>
+        /// <param name="sender">ignore</param>
+        /// <param name="e">ignore</param>
+        private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e) {
             TopLabels.TranslationX = -e.ScrollX;
         }
 
-
-        private void OnPageLoaded(object sender, EventArgs e)
-        {
-            // set the focus to the widget (e.g., entry) that you want   
+        /// <summary>
+        /// Sets focus to the first cell when the page is loaded.
+        /// </summary>
+        /// <param name="sender">ignore</param>
+        /// <param name="e">ignore</param>
+        private void OnPageLoaded(object sender, EventArgs e) {
+            // Set the focus to the widget (e.g., entry) that you want
             EntryColumn[0, 0].Focus();
-
         }
-
     }
 }
