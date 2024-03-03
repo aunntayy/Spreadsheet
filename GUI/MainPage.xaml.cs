@@ -1,5 +1,7 @@
 ﻿using Microsoft.UI.Xaml.Automation;
 using SS;
+using System.Threading.Channels;
+using Windows.Storage.Pickers.Provider;
 
 namespace GUI
 {
@@ -84,13 +86,41 @@ namespace GUI
             }
         }
 
-        void FileMenuNew(object sender, EventArgs e)
+        private async void FileMenuNew(object sender, EventArgs e)
         {
-
+            bool saveChange = false;
+            Spreadsheet currentSpread = ss;
+            if (ss.Changed)
+            {
+                saveChange = await DisplayAlert("Unsaved change", "Do you want to save the changed before open new file ?", "yes", "Cancel");
+                if (saveChange)
+                {
+                    // Restore the original spreadsheet if changes are not saved
+                    ss = currentSpread;
+                    return;
+                }
+            }
+            if (!ss.Changed || !saveChange)
+            {
+                ClearGrid();
+                ss = new Spreadsheet();
+            }
         }
-
+        
         private async void FileMenuOpenAsync(object sender, EventArgs e)
         {
+            Spreadsheet currentSpread = ss;
+            if (ss.Changed)
+            {
+                bool saveChange = await DisplayAlert("Unsaved change", "Do you want to save the changed before open new file ?", "yes", "Cancel");
+                if (saveChange)
+                {
+                    // Restore the original spreadsheet if changes are not saved
+                    ss = currentSpread;
+                    return;
+                }
+            }
+
             try
             {
                 // Use FilePicker to select a file
@@ -108,9 +138,11 @@ namespace GUI
                         await DisplayAlert("Invalid extension", extension, "OK");
                         return;
                     }
+
                     ClearGrid();
 
                     ss = new Spreadsheet(selectedFilePath, s => true, s => s, "six");
+
                     foreach (string cell in ss.GetNamesOfAllNonemptyCells())
                     {
                         // Extract row and column indices from the cell name
@@ -136,6 +168,7 @@ namespace GUI
                 await DisplayAlert("Error", $"Failed to open file: {ex.Message}", "OK");
             }
         }
+
         private void ClearGrid()
         {
             for (int i = 0; i < col; i++)
@@ -160,9 +193,17 @@ namespace GUI
                 {
                     // Ask user for filename
                     string filename = await DisplayPromptAsync("Enter file name", "Please enter the file name:");
+                    if (string.IsNullOrEmpty(filename))
+                    {
+                        return;
+                    }
                     filename = filename + ".sprd";
                     // Ask user for file path
                     string filepath = await DisplayPromptAsync("Enter file path", "Please enter the file path:");
+                    if (string.IsNullOrEmpty(filepath))
+                    {
+                        return;
+                    }
 
                     // If filepath is null, set the base directory
                     if (string.IsNullOrEmpty(filepath))
