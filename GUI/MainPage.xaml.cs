@@ -1,17 +1,17 @@
-﻿using Microsoft.UI.Xaml.Automation;
-using SS;
-using System.Threading.Channels;
-using Windows.Storage.Pickers.Provider;
+﻿using SS;
+
 
 namespace GUI
 {
     public partial class MainPage : ContentPage
     {
+        // Initialize needed var
         private Dictionary<string, Entry> Cell;
         private Spreadsheet ss = new Spreadsheet(s => true, s => s.ToUpper(), "six");
-        private MyEntry[,] EntryColumn = new MyEntry[10, 10];
         private List<HorizontalStackLayout> Rows = new List<HorizontalStackLayout>();
-
+        private string currentFilePath = ""; // Variable to store the current file path
+        // If the spread sheet size need to be change
+        private MyEntry[,] EntryColumn = new MyEntry[10, 10];
         private int col = 10;
         private int row = 10;
         public MainPage()
@@ -21,7 +21,9 @@ namespace GUI
             createGrid();
         }
 
-
+        /// <summary>
+        /// Create the grid 
+        /// </summary>
         private void createGrid()
         {
             EntryColumn = new MyEntry[col, row];
@@ -85,13 +87,19 @@ namespace GUI
                 bar.Add(verRow); // Add the row to the vertical layout
             }
         }
-
+        /// <summary>
+        /// Function for button new
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private async void FileMenuNew(object sender, EventArgs e)
         {
+            // Check for saving changes
             bool saveChange = false;
             Spreadsheet currentSpread = ss;
             if (ss.Changed)
             {
+                // prompt the user if they want to save
                 saveChange = await DisplayAlert("Unsaved change", "Do you want to save the changed before open new file ?", "yes", "Cancel");
                 if (saveChange)
                 {
@@ -100,16 +108,34 @@ namespace GUI
                     return;
                 }
             }
+            // If no save
             if (!ss.Changed || !saveChange)
             {
                 ClearGrid();
                 ss = new Spreadsheet();
             }
         }
+
+        /// <summary>
+        /// Helper funtion to clear up the grid
+        /// </summary>
+        private void ClearGrid()
+        {
+            for (int i = 0; i < col; i++)
+            {
+                for (int j = 0; j < row; j++)
+                {
+                    EntryColumn[i, j].Text = ""; // Clear cell content
+                }
+            }
+        }
         
+
+        // Function for button Open
         private async void FileMenuOpenAsync(object sender, EventArgs e)
         {
             Spreadsheet currentSpread = ss;
+            // Check to know if the user wants to save their current spreadsheet
             if (ss.Changed)
             {
                 bool saveChange = await DisplayAlert("Unsaved change", "Do you want to save the changed before open new file ?", "yes", "Cancel");
@@ -133,16 +159,18 @@ namespace GUI
                 {
                     string selectedFilePath = fileResult.FullPath;
                     string extension = Path.GetExtension(selectedFilePath);
+                    // Check for the right extension
                     if (extension != ".sprd")
                     {
                         await DisplayAlert("Invalid extension", extension, "OK");
                         return;
                     }
-
+                    // Clear the current grid
                     ClearGrid();
 
+                    currentFilePath = selectedFilePath; // Update the current file path
                     ss = new Spreadsheet(selectedFilePath, s => true, s => s, "six");
-
+                    // Populate the new open spreadsheet with the open file content
                     foreach (string cell in ss.GetNamesOfAllNonemptyCells())
                     {
                         // Extract row and column indices from the cell name
@@ -160,95 +188,83 @@ namespace GUI
                 }
                 else
                 {
+                    // If no file was selected
                     await DisplayAlert("Error", "No file selected", "OK");
                 }
             }
             catch (Exception ex)
             {
+                // If any errors occur
                 await DisplayAlert("Error", $"Failed to open file: {ex.Message}", "OK");
             }
         }
 
-        private void ClearGrid()
+        // Function to save changes
+        private async Task SaveChanges()
         {
-            for (int i = 0; i < col; i++)
+            try
             {
-                for (int j = 0; j < row; j++)
+                // If the current file path is not empty, save the changes directly
+                if (!string.IsNullOrEmpty(currentFilePath))
                 {
-                    EntryColumn[i, j].Text = ""; // Clear cell content
+                    ss?.Save(currentFilePath);
+                    await DisplayAlert("Success", $"File saved successfully at: {currentFilePath}", "OK");
+                }
+                else
+                {
+                        // If the current file path is empty, prompt the user to enter a new file path
+                        string filename = await DisplayPromptAsync("Enter file name", "Please enter the file name:");
+                        if (string.IsNullOrEmpty(filename))
+                        {
+                            return;
+                        }
+                        filename = filename + ".sprd";
+                        string filepath = await DisplayPromptAsync("Enter file path", "Please enter the file path:");
+                        if (string.IsNullOrEmpty(filepath))
+                        {
+                            return;
+                        }
+                        if (string.IsNullOrEmpty(filepath))
+                        {
+                            filepath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
+                        }
+
+                        string filePath = Path.Combine(filepath, filename);
+
+                        ss?.Save(filePath);
+                        await DisplayAlert("Success", $"File saved successfully at: {filePath}", "OK");
+                        currentFilePath = filePath; // Update the current file path
                 }
             }
+            catch (Exception ex)
+            {
+                await DisplayAlert("Error", $"Failed to save file: {ex.Message}", "OK");
+            }
         }
+
+        // Function for the Save button
+        private async void Save(object sender, EventArgs e)
+        {
+            if (ss.Changed)
+            {
+                await SaveChanges();
+            }
+            else
+            {
+                await DisplayAlert("No changes", "No changes have been made since the file was opened.", "OK");
+            }
+        }
+
+        /// <summary>
+        /// Function for the Help button
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         void Help(object sender, EventArgs e)
         {
             HelpPage help = new HelpPage();
             Navigation.PushAsync(help, true);
         }
-        // Function for saving the sheet
-        private async void Save(object sender, EventArgs e)
-        {
-            // Check for any changed
-            if (ss.Changed)
-            {
-                try
-                {
-                    // Ask user for filename
-                    string filename = await DisplayPromptAsync("Enter file name", "Please enter the file name:");
-                    if (string.IsNullOrEmpty(filename))
-                    {
-                        return;
-                    }
-                    filename = filename + ".sprd";
-                    // Ask user for file path
-                    string filepath = await DisplayPromptAsync("Enter file path", "Please enter the file path:");
-                    if (string.IsNullOrEmpty(filepath))
-                    {
-                        return;
-                    }
-
-                    // If filepath is null, set the base directory
-                    if (string.IsNullOrEmpty(filepath))
-                    {
-                        filepath = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                    }
-
-
-                    // Combine the directory path with the filename
-                    string filePath = Path.Combine(filepath, filename);
-
-                    try
-                    {
-                        // Save the file
-                        ss?.Save(filePath);
-                        // Show success message
-                        await DisplayAlert("Success", $"File saved successfully at: {filePath}", "OK");
-                    }
-                    catch (Exception)
-                    {
-                        // If saving fails due to invalid file path, save in base directory
-                        string baseDirectory = Environment.GetFolderPath(Environment.SpecialFolder.Personal);
-                        filePath = Path.Combine(baseDirectory, filename);
-
-                        // Attempt to save in the base directory
-                        ss?.Save(filePath);
-
-                        // Show message to user
-                        await DisplayAlert("Warning", $"Invalid file path. File saved in base directory at: {filePath}", "OK");
-
-                    }
-                }
-                catch (Exception ex)
-                {
-                    // Show error message if any other exception occurs
-                    await DisplayAlert("Error", $"Failed to save file: {ex.Message}", "OK");
-                }
-            }
-            // Prompt the user for unchange so no save
-            else { await DisplayAlert("No change have been make", $"Failed to save file", "OK"); }
-        }
-
-
-
 
         // Make sure everything is Synchronize
         private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
