@@ -181,7 +181,8 @@ namespace GUI
         }
         void Help(object sender, EventArgs e)
         {
-
+            HelpPage help = new HelpPage();
+            Navigation.PushAsync(help, true);
         }
         // Function for saving the sheet
         private async void Save(object sender, EventArgs e)
