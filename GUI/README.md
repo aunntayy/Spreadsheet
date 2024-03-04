@@ -39,7 +39,7 @@ Copyright:  CS 3500 and Phuc Hoang - This work may not be copied for use in Acad
 	We have total of 7 branchs not included the master. 
  		1.aunAS6: Create the column, row, and spreadsheet cell.
    		2.A6_aunntayy_2 : Changed how the spreadsheet cell work. Added MyEntry class. Have Save working but not really how we 
-     		wanted it to work. Add OnPageLoaded to focus a cell.
+     	wanted it to work. Add OnPageLoaded to focus a cell.
        	3.A6_aunntayy_3 : Cell able to evaluate. Phuc did something and the whole project won't work. Also master won't work after 
 	 	we merge together. 
 	 	4.A6_aunntayy_4 : Try to find the way to make the project work but ended up not working.
