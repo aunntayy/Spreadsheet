@@ -44,7 +44,7 @@ Copyright:  CS 3500 and Phuc Hoang - This work may not be copied for use in Acad
 	 	we merge together. 
 	 	4.A6_aunntayy_4 : Try to find the way to make the project work but ended up not working.
    		5.A6_Phuc_1: Deleted after create a second version.
-     		6.A6_Phuc_2: A6_Phuc_1 messed up so I created a new branch. Got save, open and new button work. Also, added help page. 
+     		6.A6_Phuc_2: A6_Phuc_1 messed up so I created a new branch. Got save, open and new button work. Also, added help page. Scrollview for the application. 
        		7.A6_Phuc_3: Debugged the save, open and new button.Also, added more features. Now, this branch is the only branch that work. 
 
   	We tried to merge the working branch into master branch. The master branch won't run and it will show the same errors. So we submitted this
