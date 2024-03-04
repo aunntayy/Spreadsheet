@@ -96,16 +96,14 @@ namespace GUI
 
         public void CellUpdated()
         {
-            string cell = GetCellName();
             string content = this.Text;
+            string cell = GetCellName();
 
             try
             {
-                // Set the contents of the cell and get the list of dependent cells
-                IList<string> dependentCells = ss.SetContentsOfCell(cell, content);
-
-                // Update the UI with the new content of the cell
+                ss.SetContentsOfCell(cell, content);
                 object cellValue = ss.GetCellValue(cell);
+
                 if (cellValue is string stringValue)
                 {
                     // If the cell value is a string, set the text of the entry box to the string value
@@ -125,51 +123,16 @@ namespace GUI
                 {
                     this.Text = "ERROR";
                 }
-
-                foreach (string dependentCell in dependentCells)
-                {
-                    // Retrieve the UI element corresponding to the dependent cell name
-                    if (cellEntries.TryGetValue(dependentCell, out MyEntry dependentEntryToUpdate))
-                    {
-                        // Get the new value for the dependent cell from the spreadsheet
-                        object newValue = ss.GetCellValue(dependentCell);
-
-                        // Update the UI element (dependentEntryToUpdate) with the new value
-                        if (newValue is string stringValueDependent)
-                        {
-                            // If the new value is a string, set the text of the entry box to the string value
-                            dependentEntryToUpdate.Text = stringValueDependent;
-                        }
-                        else if (newValue is double doubleValue)
-                        {
-                            // If the new value is a double, convert it to a string and set the text of the entry box
-                            dependentEntryToUpdate.Text = doubleValue.ToString();
-                        }
-                        else if (newValue is Formula formula)
-                        {
-                            // If the new value is a formula, set the text of the entry box to the formula representation
-                            dependentEntryToUpdate.Text = "=" + formula.ToString();
-                        }
-                        else if (newValue is FormulaError formulaError)
-                        {
-                            // Handle formula error, if needed
-                            dependentEntryToUpdate.Text = "ERROR";
-                        }
-                    }
-                }
             }
             catch (FormulaFormatException)
             {
                 Text = "ERROR";
             }
-            catch (CircularException)
-            {
-                Text = "CIRCULAR DEPENDENCY";
-            }
             catch (Exception)
             {
                 Text = "ERROR2";
             }
+
         }
 
 

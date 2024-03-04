@@ -27,9 +27,9 @@ Copyright:  CS 3500 and Phuc Hoang - This work may not be copied for use in Acad
      	Chanphone Visathip: 17 hours
     Distribution of each members:
         Phuc Hoang :
-		Save files, Open files, New Files, Extra features
+		Save files, Cell grid, Open files, New Files. Total commit: 60
         Chanphone Visathip : 
-		Entry, Cell grid, Widgets, Cell Calculation 
+		Entry, Cell grid, Widgets, Cell Calculation Total commit: 66
 
 # Reflection on partnerships
 	At first, we both did pair programmings but it didn't workout really well. Since, we have to learned a lot about the 
