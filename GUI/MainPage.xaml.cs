@@ -34,54 +34,7 @@ namespace GUI
             showContent.Completed += ChangeContent;
         }
 
-        /// <summary>
-        /// Handles the completion of the content change animation.
-        /// </summary>
-        /// <param name="e">ignore</param>
-        /// <param name="sender">ignore</param>
-        private void ChangeContent(object? sender, EventArgs e)
-        {
-            foreach (var entry in EntryColumn)
-            {
-                if (selectedCell.Text.Equals(entry.GetCellName()))
-                {
-                    entry.Text = showContent.Text;
-                    entry.CellUpdated();
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Updates the content shown based on the focused cell.
-        /// </summary>
-        private void ShowContent()
-        {
-            foreach (var entry in EntryColumn)
-            {
-                if (entry.IsFocused)
-                {
-                    showContent.Text = entry.Text;
-                    break;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Updates the selected cell indicator based on the focused cell.
-        /// </summary>
-        private void ShowSelectedCell()
-        {
-            foreach (var entry in EntryColumn)
-            {
-                if (entry.IsFocused)
-                {
-                    selectedCell.Text = entry.GetCellName();
-                    break;
-                }
-            }
-        }
-
+        #region -- Spreadsheet and Grid set up
         /// <summary>
         /// Creates the grid layout for the spreadsheet.
         /// </summary>
@@ -145,27 +98,78 @@ namespace GUI
                 bar.Add(verRow); // Add the row to the vertical layout
             }
         }
+        #endregion -- End of spreadsheet set up
+
+        #region -- Set of for top bar function
+        /// <summary>
+        /// Handles the completion of the content change animation.
+        /// </summary>
+        /// <param name="e">ignore</param>
+        /// <param name="sender">ignore</param>
+        private void ChangeContent(object? sender, EventArgs e)
+        {
+            foreach (var entry in EntryColumn)
+            {
+                if (selectedCell.Text.Equals(entry.GetCellName()))
+                {
+                    entry.Text = showContent.Text;
+                    entry.CellUpdated();
+                    break;
+                }
+            }
+        }
+        /// <summary>
+        /// Handles the horizontal scrolling of top labels.
+        /// </summary>
+        /// <param name="sender">ignore</param>
+        /// <param name="e">ignore</param>
+        private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
+        {
+            TopLabels.TranslationX = -e.ScrollX;
+        }
 
         /// <summary>
-        /// Clears the content of the grid.
+        /// Sets focus to the first cell when the page is loaded.
         /// </summary>
-        private void ClearGrid()
+        /// <param name="sender">ignore</param>
+        /// <param name="e">ignore</param>
+        private void OnPageLoaded(object sender, EventArgs e)
         {
-            for (int i = 0; i < col; i++)
+            // Set the focus to the widget (e.g., entry) that you want
+            EntryColumn[0, 0].Focus();
+        }
+        /// <summary>
+        /// Updates the content shown based on the focused cell.
+        /// </summary>
+        private void ShowContent()
+        {
+            foreach (var entry in EntryColumn)
             {
-                for (int j = 0; j < row; j++)
+                if (entry.IsFocused)
                 {
-                    // Clear cell content
-                    string cellValue = "";
-                    // Update the corresponding MyEntry value
-                    EntryColumn[j, i].Text = cellValue;
-                    // Update the cell
-                    EntryColumn[j, i].CellUpdated();
+                    showContent.Text = entry.Text;
+                    break;
                 }
             }
         }
 
+        /// <summary>
+        /// Updates the selected cell indicator based on the focused cell.
+        /// </summary>
+        private void ShowSelectedCell()
+        {
+            foreach (var entry in EntryColumn)
+            {
+                if (entry.IsFocused)
+                {
+                    selectedCell.Text = entry.GetCellName();
+                    break;
+                }
+            }
+        }
+        #endregion -- End of top bar
 
+        #region -- Menu and its function
         /// <summary>
         /// Creates a new spreadsheet.
         /// </summary>
@@ -251,7 +255,45 @@ namespace GUI
                 await DisplayAlert("Error", $"Failed to open file: {ex.Message}", "OK");
             }
         }
+        /// <summary>
+        /// Clears the content of the grid.
+        /// </summary>
+        private void ClearGrid()
+        {
+            for (int i = 0; i < col; i++)
+            {
+                for (int j = 0; j < row; j++)
+                {
+                    // Clear cell content
+                    string cellValue = "";
+                    // Update the corresponding MyEntry value
+                    EntryColumn[j, i].Text = cellValue;
+                    // Update the cell
+                    EntryColumn[j, i].CellUpdated();
+                }
+            }
+        }
+        /// <summary>
+        /// Saves the changes made to the spreadsheet when the Save button is clicked.
+        /// </summary>
+        /// <param name="sender">ignore</param>
+        /// <param name="e">ignore</param>
+        private async void Save(object sender, EventArgs e)
+        {
+            if (ss.Changed)
+            {
+                await SaveChanges();
+            }
+            else
+            {
+                await DisplayAlert("No changes", "No changes have been made since the file was opened.", "OK");
+            }
+        }
 
+        /// <summary>
+        /// Helper to load the spreadsheet in xml to grid
+        /// </summary>
+        /// <param name="filepath"></param>
         private void LoadSpreadsheet(string filepath)
         {
             try
@@ -287,7 +329,6 @@ namespace GUI
                 Console.WriteLine("Error loading spreadsheet: " + ex.Message);
             }
         }
-
 
         /// <summary>
         /// Saves the changes made to the spreadsheet.
@@ -332,23 +373,6 @@ namespace GUI
         }
 
         /// <summary>
-        /// Saves the changes made to the spreadsheet when the Save button is clicked.
-        /// </summary>
-        /// <param name="sender">ignore</param>
-        /// <param name="e">ignore</param>
-        private async void Save(object sender, EventArgs e)
-        {
-            if (ss.Changed)
-            {
-                await SaveChanges();
-            }
-            else
-            {
-                await DisplayAlert("No changes", "No changes have been made since the file was opened.", "OK");
-            }
-        }
-
-        /// <summary>
         /// Navigates to the help page.
         /// </summary>
         /// <param name="sender">ignore</param>
@@ -358,26 +382,6 @@ namespace GUI
             HelpPage help = new HelpPage();
             Navigation.PushAsync(help, true);
         }
-
-        /// <summary>
-        /// Handles the horizontal scrolling of top labels.
-        /// </summary>
-        /// <param name="sender">ignore</param>
-        /// <param name="e">ignore</param>
-        private void OnTopLabelsScrolled(object sender, ScrolledEventArgs e)
-        {
-            TopLabels.TranslationX = -e.ScrollX;
-        }
-
-        /// <summary>
-        /// Sets focus to the first cell when the page is loaded.
-        /// </summary>
-        /// <param name="sender">ignore</param>
-        /// <param name="e">ignore</param>
-        private void OnPageLoaded(object sender, EventArgs e)
-        {
-            // Set the focus to the widget (e.g., entry) that you want
-            EntryColumn[0, 0].Focus();
-        }
+        #endregion -- End of Help menu
     }
 }
