@@ -7,7 +7,7 @@ GitHub ID:  PhucHoang123
 Repo:       https://github.com/uofu-cs3500-spring24/assignment-six-gui-functioning-spreadsheet-v_tekkkkk
 Commit Date: 1-16-2024 11:25pm
 Solution:   Spreadsheet
-Copyright:  CS 3500 and [Your Name(s)] - This work may not be copied for use in Academic Coursework.
+Copyright:  CS 3500 and Phuc Hoang - This work may not be copied for use in Academic Coursework.
 ```
 
 # Overview of the Spreadsheet functionality
@@ -22,7 +22,7 @@ Future extensions will be added
     3. Assignment three:    Predicted Hours:          20        Actual Hours:   10
     4. Assignment Four:     Predicted Hours:          20        Actual Hours:   11
     5. Assignment Five:     Predicted Hours:          20        Actual Hours:   24
-    6. Assignment Six:      Predicted Hours:                    Actual Hours:
+    6. Assignment Six:      Predicted Hours:          30        Actual Hours:   35
 
 # Good software practice (GSP)
     1.DRY : 

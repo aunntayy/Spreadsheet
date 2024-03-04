@@ -18,9 +18,9 @@ Copyright:  CS 3500 and Phuc Hoang - This work may not be copied for use in Acad
     Trenton Straton, Vu Thi Ha Thu, Sharach, Ted
 # References:
 
-    1. Title of page - URL
-    2. Title of page - URL
-    3. Title of page - URL
+    1. Chat Gpt: Ask for general Maui questions and many more - https://chat.openai.com/
+    2. File picker - https://learn.microsoft.com/en-us/dotnet/maui/platform-integration/storage/file-picker?view=net-maui-8.0&tabs=windows
+    3. Trouble in using FileOpenPicker - https://learn.microsoft.com/en-us/answers/questions/1463649/trouble-in-using-fileopenpicker
 # Partnerships
     Distribution of each members:
         Phuc Hoang :
