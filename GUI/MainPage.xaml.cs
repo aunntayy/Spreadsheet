@@ -3,6 +3,24 @@ using System.Xml;
 
 namespace GUI
 {
+    /// <summary>
+    /// Author:    Phuc Hoang
+    /// Partner:   Chanphone Visathip
+    /// Date:      24-2-2024
+    /// Course:    CS 3500, University of Utah, School of Computing
+    /// Copyright: CS 3500 and Phuc Hoang - This work may not 
+    ///            be copied for use in Academic Coursework.
+    ///
+    /// I, Phuc Hoang, certify that I wrote this code from scratch and
+    /// did not copy it in part or whole from another source. All 
+    /// references used in the completion of the assignments are cited 
+    /// in my README file.
+    /// 
+    /// File Contents
+    /// 
+    /// This file contains the MainPage class, which represents the main content page of a .NET MAUI application.
+    /// It includes functionality to create, open, and save spreadsheets, as well as handle user interactions with the spreadsheet GUI.
+    /// </summary>
     public partial class MainPage : ContentPage
     {
         // Initialize needed variables
@@ -289,6 +307,15 @@ namespace GUI
                 await DisplayAlert("No changes", "No changes have been made since the file was opened.", "OK");
             }
         }
+        // Override the OnDisappearing method to handle page disappearing
+        private async void Exit(object sender, EventArgs e)
+        {
+            if (ss.Changed)
+            {
+                await SaveChanges();
+            }
+            Application.Current.Quit();
+        }
 
         /// <summary>
         /// Helper to load the spreadsheet in xml to grid
@@ -382,6 +409,7 @@ namespace GUI
             HelpPage help = new HelpPage();
             Navigation.PushAsync(help, true);
         }
+
         #endregion -- End of Help menu
     }
 }

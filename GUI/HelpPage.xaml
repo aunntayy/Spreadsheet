@@ -14,6 +14,8 @@
 
             <Label Text="To save your changes, click on the 'File' menu and select the 'Save' option. You will be prompted to enter a file name and location to save the spreadsheet. Once saved, your changes will be preserved." />
 
+            <Label Text="To Exit, navigate down the menu and press exit" />
+
             <Label Text="If you encounter any issues or need assistance, feel free to reach 911 for help." />
 
             <BoxView HeightRequest="1" BackgroundColor="Black" HorizontalOptions="FillAndExpand" Margin="0,10,0,10" />

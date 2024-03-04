@@ -545,8 +545,6 @@ namespace SS
                 Formula f = new Formula(content, Normalize, IsValid);
                 return SetCellContents(name, f);
             }
-
-
             return SetCellContents(name, content);
          }
         /// <summary>

@@ -1,4 +1,23 @@
 ﻿<?xml version="1.0" encoding="utf-8" ?>
+<!--
+    Author:    Phuc Hoang
+    Partner:   Chanphone Visathip
+    Date:      24-2-2024
+    Course:    CS 3500, University of Utah, School of Computing
+    Copyright: CS 3500 and Phuc Hoang - This work may not 
+               be copied for use in Academic Coursework.
+
+    I, Phuc Hoang, certify that I wrote this code from scratch and
+    did not copy it in part or whole from another source. All 
+    references used in the completion of the assignments are cited 
+    in my README file.
+
+    File Contents
+
+    This XML document defines the layout and functionality of the MainPage class in a .NET MAUI application.
+    The MainPage class represents the main content page of the application, including menu bar items, column headers, 
+    spreadsheet GUI cells, and other visual elements.
+-->
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
              x:Class="GUI.MainPage">
@@ -7,6 +26,7 @@
             <MenuFlyoutItem Text="New" Clicked="FileMenuNew" />
             <MenuFlyoutItem Text="Open" Clicked="FileMenuOpenAsync" />
             <MenuFlyoutItem Text="Save" Clicked="Save" />
+            <MenuFlyoutItem Text="Exit" Clicked="Exit" />
             <MenuFlyoutItem Text="Help?" Clicked="Help" />
         </MenuBarItem>
     </ContentPage.MenuBarItems>
