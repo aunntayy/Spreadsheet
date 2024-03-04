@@ -106,7 +106,7 @@ namespace SS
         }
 
         // Method to load the spreadsheet data from an XML file
-        private void LoadXml(string filepath)
+        public void LoadXml(string filepath)
         {
             // Use XmlReader to read the XML file
             using (XmlReader reader = XmlReader.Create(filepath))
@@ -548,7 +548,7 @@ namespace SS
 
 
             return SetCellContents(name, content);
-        }
+         }
         /// <summary>
         ///   Look up the version information in the given file. If there are any problems opening, reading, 
         ///   or closing the file, the method should throw a SpreadsheetReadWriteException with an explanatory message.
